@@ -121,10 +121,10 @@ def get_time_from_str(when):
         hour=0, minute=0, second=0, microsecond=0
     )
 
-    # Only apply dayfirst=True if date actually starts with "XX-XX-".
+    # Only apply dayfirst=True if date actually starts with "XX-XX-" or "XX.XX.".
     # Other forms like YYYY-MM-DD shouldn't rely on locale by default (#792).
     dayfirst = (
-        _is_dayfirst_locale() if re.match(r'^\d{1,2}-\d{1,2}-', when) else None
+        True if re.match(r"^\d{1,2}[-.]\d{1,2}[-.]", when) else _is_dayfirst_locale()
     )
     try:
         event_time = dateutil_parse(
