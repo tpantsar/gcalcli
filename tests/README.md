@@ -1,7 +1,17 @@
 # Tests for gcalcli
 
 This directory contains unit tests and functional tests for gcalcli. To run them all, make sure
-you've installed [tox](https://tox.wiki/) and a supported python version, then in the repository root dir run
+you've installed [tox](https://tox.wiki/) and a supported python version.
+
+tox installation with pipx:
+
+```shell
+pip install pipx
+pipx install tox
+tox --help
+```
+
+Then in the repository root dir run:
 
 ```shell
 git submodule update --init
@@ -14,7 +24,7 @@ Or run individual configurations like
 tox -e py38,cli
 ```
 
-The supported tox testing envs are listed and configured in ../tox.ini.
+The supported tox testing envs are listed and configured in [../tox.ini](../tox.ini).
 
 They're also configured to run on GitHub pull requests for various platforms and python versions
 (config: ../.github/workflows/tests.yml).
@@ -54,5 +64,5 @@ repo.
 
 Some tests may fail on `assert_snapshot` calls from the
 [bats-snapshot](https://github.com/markkong318/bats-snapshot) helper, in which case you can easily
-update snapshots by finding and deleting the corresponding .snap file in \__snapshots__/, rerunning
+update snapshots by finding and deleting the corresponding .snap file in \_\_snapshots\_\_/, rerunning
 the cli tests, and then reviewing the updated snapshot file to make sure the diff is expected.
