@@ -14,9 +14,7 @@
       "selected": true,
       "backgroundColor": "#9fc6e7",
       "conferenceProperties": {
-        "allowedConferenceSolutionTypes": [
-          "eventNamedHangout"
-        ]
+        "allowedConferenceSolutionTypes": ["eventNamedHangout"]
       },
       "kind": "calendar#calendarListEntry"
     },
@@ -33,9 +31,7 @@
       "selected": true,
       "backgroundColor": "#b99aff",
       "conferenceProperties": {
-        "allowedConferenceSolutionTypes": [
-          "eventNamedHangout"
-        ]
+        "allowedConferenceSolutionTypes": ["eventNamedHangout"]
       },
       "kind": "calendar#calendarListEntry"
     },
@@ -81,9 +77,7 @@
       "selected": true,
       "backgroundColor": "#d06b64",
       "conferenceProperties": {
-        "allowedConferenceSolutionTypes": [
-          "eventHangout"
-        ]
+        "allowedConferenceSolutionTypes": ["eventHangout"]
       },
       "kind": "calendar#calendarListEntry"
     },
@@ -99,9 +93,7 @@
       "selected": true,
       "backgroundColor": "#92e1c0",
       "conferenceProperties": {
-        "allowedConferenceSolutionTypes": [
-          "eventHangout"
-        ]
+        "allowedConferenceSolutionTypes": ["eventHangout"]
       },
       "kind": "calendar#calendarListEntry"
     },
@@ -117,9 +109,7 @@
       "selected": true,
       "backgroundColor": "#9fc6e7",
       "conferenceProperties": {
-        "allowedConferenceSolutionTypes": [
-          "eventHangout"
-        ]
+        "allowedConferenceSolutionTypes": ["eventHangout"]
       },
       "kind": "calendar#calendarListEntry"
     },
@@ -135,9 +125,7 @@
       "selected": true,
       "backgroundColor": "#ffad46",
       "conferenceProperties": {
-        "allowedConferenceSolutionTypes": [
-          "eventHangout"
-        ]
+        "allowedConferenceSolutionTypes": ["eventHangout"]
       },
       "kind": "calendar#calendarListEntry"
     }
