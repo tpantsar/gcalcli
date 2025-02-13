@@ -312,7 +312,7 @@ class GoogleCalendarInterface:
         auth.refresh_if_expired(self.credentials)
         self.printer.debug_msg('Successfully loaded credentials\n')
 
-    def get_cal_service(self):
+    def get_cal_service(self) -> build:
         if not self.cal_service and not self.userless_mode:
             self.cal_service = build(
                 serviceName='calendar',
@@ -813,7 +813,7 @@ class GoogleCalendarInterface:
                 event_color = self._calendar_color(event, override_color=True)
         else:
             event_color = (
-                self.options['color_now_marker']
+                self.options.get('color_now_marker')
                 if happening_now and not all_day
                 else self._calendar_color(event)
             )
@@ -824,14 +824,14 @@ class GoogleCalendarInterface:
             self.printer.msg(fmt % ('', _valid_title(event).strip()), event_color)
         else:
             tmp_start_time_str = utils.agenda_time_fmt(
-                event['s'], self.options['military']
+                event['s'], self.options.get('military')
             )
             tmp_end_time_str = ''
             fmt = '  ' + time_width + '   ' + time_width + '  %s\n'
 
             if self.details.get('end'):
                 tmp_end_time_str = utils.agenda_time_fmt(
-                    event['e'], self.options['military']
+                    event['e'], self.options.get('military')
                 )
                 fmt = '  ' + time_width + ' - ' + time_width + '  %s\n'
 
@@ -1151,6 +1151,7 @@ class GoogleCalendarInterface:
             self._PrintEvent(event, event['s'].strftime('\n%Y-%m-%d'))
 
     def _iterate_events(self, start_datetime, event_list, year_date=False, work=None):
+        """Iterate over events and print them."""
         selected = 0
 
         if len(event_list) == 0:
@@ -1273,6 +1274,7 @@ class GoogleCalendarInterface:
             )
 
     def _display_queried_events(self, start, end, search=None, year_date=False):
+        """Display events queried by the user between start and end."""
         event_list = self._search_for_events(start, end, search)
 
         if self.options.get('tsv'):
