@@ -113,6 +113,7 @@ def test_get_parsed_timedelta_from_str():
     assert get_timedelta_from_str('3.5h') == timedelta(hours=3, minutes=30)
     assert get_timedelta_from_str('1') == timedelta(minutes=1)
     assert get_timedelta_from_str('1m') == timedelta(minutes=1)
+    assert get_timedelta_from_str('0.5h') == timedelta(minutes=30)
     assert get_timedelta_from_str('1h') == timedelta(hours=1)
     assert get_timedelta_from_str('1h1m') == timedelta(hours=1, minutes=1)
     assert get_timedelta_from_str('1:10') == timedelta(hours=1, minutes=10)
