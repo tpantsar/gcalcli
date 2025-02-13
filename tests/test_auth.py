@@ -16,9 +16,7 @@ def test_legacy_certs(tmpdir, gcali_patches, patched_google_reauth):
     oauth_filepath = tmpdir / 'oauth'
     shutil.copy(TEST_DATA_DIR / 'legacy_oauth_creds.json', oauth_filepath)
     gcal = gcali_patches.GCalI(data_path=tmpdir, refresh_cache=False)
-    assert isinstance(
-        gcal.get_cal_service(), googleapiclient.discovery.Resource
-    )
+    assert isinstance(gcal.get_cal_service(), googleapiclient.discovery.Resource)
     with open(oauth_filepath, 'rb') as gcalcli_oauth:
         try:
             pickle.load(gcalcli_oauth)

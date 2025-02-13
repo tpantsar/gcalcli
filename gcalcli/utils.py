@@ -1,5 +1,4 @@
 import calendar
-from collections import OrderedDict
 import json
 import locale
 import os
@@ -8,6 +7,7 @@ import pickle
 import re
 import subprocess
 import time
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from typing import Any, Tuple
 
@@ -59,15 +59,11 @@ def set_locale(new_locale):
         locale.setlocale(locale.LC_ALL, new_locale)
     except locale.Error as exc:
         raise ValueError(
-            'Error: '
-            + str(exc)
-            + '!\n Check supported locales of your system.\n'
+            'Error: ' + str(exc) + '!\n Check supported locales of your system.\n'
         )
 
 
-def get_times_from_duration(
-    when, duration=0, end=None, allday=False
-) -> Tuple[str, str]:
+def get_times_from_duration(when, duration=0, end=None, allday=False) -> Tuple[str, str]:
     try:
         start = get_time_from_str(when)
     except Exception:
@@ -79,9 +75,7 @@ def get_times_from_duration(
         try:
             stop = start + timedelta(days=float(duration))
         except Exception:
-            raise ValueError(
-                'Duration time (days) is invalid: %s\n' % (duration)
-            )
+            raise ValueError('Duration time (days) is invalid: %s\n' % (duration))
         start = start.date()
         stop = stop.date()
     else:
@@ -124,12 +118,10 @@ def get_time_from_str(when):
     # Only apply dayfirst=True if date actually starts with "XX-XX-" or "XX.XX.".
     # Other forms like YYYY-MM-DD shouldn't rely on locale by default (#792).
     dayfirst = (
-        True if re.match(r"^\d{1,2}[-.]\d{1,2}[-.]", when) else _is_dayfirst_locale()
+        True if re.match(r'^\d{1,2}[-.]\d{1,2}[-.]', when) else _is_dayfirst_locale()
     )
     try:
-        event_time = dateutil_parse(
-            when, default=zero_oclock_today, dayfirst=dayfirst
-        )
+        event_time = dateutil_parse(when, default=zero_oclock_today, dayfirst=dayfirst)
     except ValueError:
         struct, result = fuzzy_date_parse(when)
         if not result:
@@ -242,7 +234,7 @@ def shorten_path(path: pathlib.Path) -> pathlib.Path:
 def inspect_auth() -> dict[str, Any]:
     auth_data: dict[str, Any] = OrderedDict()
     auth_path = None
-    for (path, _) in env.data_file_paths('oauth', env.config_dir()):
+    for path, _ in env.data_file_paths('oauth', env.config_dir()):
         if path.exists():
             auth_path = path
             auth_data['path'] = shorten_path(path)
@@ -256,9 +248,7 @@ def inspect_auth() -> dict[str, Any]:
                 # Try reading as legacy json format as fallback.
                 try:
                     gcalcli_oauth.seek(0)
-                    creds = auth.creds_from_legacy_json(
-                        json.load(gcalcli_oauth)
-                    )
+                    creds = auth.creds_from_legacy_json(json.load(gcalcli_oauth))
                     auth_data['format'] = 'json'
                 except (OSError, ValueError, EOFError):
                     pass

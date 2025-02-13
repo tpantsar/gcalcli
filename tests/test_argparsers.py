@@ -1,5 +1,5 @@
-from collections import namedtuple
 import shlex
+from collections import namedtuple
 
 import pytest
 
@@ -45,8 +45,7 @@ def test_output_parser(monkeypatch):
     assert output_parser.parse_args(argv).width == 70
 
     argv = shlex.split('')
-    monkeypatch.setattr(argparsers, 'get_terminal_size',
-                        sub_terminal_size(100))
+    monkeypatch.setattr(argparsers, 'get_terminal_size', sub_terminal_size(100))
     output_parser = argparsers.get_output_parser()
     assert output_parser.parse_args(argv).width == 100
 
@@ -80,8 +79,9 @@ def test_conflicts_parser():
 def test_details_parser():
     details_parser = argparsers.get_details_parser()
 
-    argv = shlex.split('--details attendees --details url '
-                       '--details location --details end')
+    argv = shlex.split(
+        '--details attendees --details url --details location --details end'
+    )
     parsed_details = details_parser.parse_args(argv).details
     assert parsed_details['attendees']
     assert parsed_details['location']

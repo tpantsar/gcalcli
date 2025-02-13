@@ -5,20 +5,20 @@ from dateutil.tz import tzlocal
 from gcalcli.conflicts import ShowConflicts
 
 minimal_event = {
-                    'e': datetime(2019, 1, 8, 15, 15, tzinfo=tzlocal()),
-                    'id': 'minimal_event',
-                    's': datetime(2019, 1, 8, 14, 15, tzinfo=tzlocal())
-                 }
+    'e': datetime(2019, 1, 8, 15, 15, tzinfo=tzlocal()),
+    'id': 'minimal_event',
+    's': datetime(2019, 1, 8, 14, 15, tzinfo=tzlocal()),
+}
 minimal_event_overlapping = {
-                    'e': datetime(2019, 1, 8, 16, 15, tzinfo=tzlocal()),
-                    'id': 'minimal_event_overlapping',
-                    's': datetime(2019, 1, 8, 14, 30, tzinfo=tzlocal())
-                 }
+    'e': datetime(2019, 1, 8, 16, 15, tzinfo=tzlocal()),
+    'id': 'minimal_event_overlapping',
+    's': datetime(2019, 1, 8, 14, 30, tzinfo=tzlocal()),
+}
 minimal_event_nonoverlapping = {
-                    'e': datetime(2019, 1, 8, 16, 15, tzinfo=tzlocal()),
-                    'id': 'minimal_event_nonoverlapping',
-                    's': datetime(2019, 1, 8, 15, 30, tzinfo=tzlocal())
-                 }
+    'e': datetime(2019, 1, 8, 16, 15, tzinfo=tzlocal()),
+    'id': 'minimal_event_nonoverlapping',
+    's': datetime(2019, 1, 8, 15, 30, tzinfo=tzlocal()),
+}
 
 
 def test_finds_no_conflicts_for_one_event():

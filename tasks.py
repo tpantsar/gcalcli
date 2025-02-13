@@ -4,13 +4,13 @@ from invoke import task
 @task
 def autoflake(ctx):
     """Remove all unused imports."""
-    ctx.run("autoflake --remove-all-unused-imports --in-place --recursive .")
+    ctx.run('autoflake --remove-all-unused-imports --in-place --recursive .')
 
 
 @task
 def isort(ctx):
     """Sort imports."""
-    ctx.run("isort .")
+    ctx.run('isort .')
 
 
 @task(pre=[autoflake, isort])

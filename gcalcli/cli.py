@@ -73,13 +73,12 @@ def rsplit_unescaped_hash(string):
             [#]
             ((?:\\.|[^#\\])*)$
         """,
-        string
+        string,
     )
     if not match:
         return (string, None)
     # Unescape and return (part1, part2)
-    return tuple(re.sub(r'\\(.)', r'\1', p)
-                 for p in match.group(1, 2))
+    return tuple(re.sub(r'\\(.)', r'\1', p) for p in match.group(1, 2))
 
 
 def parse_cal_names(cal_names: list[str], printer: Printer):
@@ -137,14 +136,10 @@ def run_add_prompt(parsed_args, printer):
             prompt = 'Duration (human readable): '
         parsed_args.duration = get_input(printer, prompt, PARSABLE_DURATION)
     if parsed_args.description is None:
-        parsed_args.description = get_input(
-            printer, 'Description: ', STR_ALLOW_EMPTY
-        )
+        parsed_args.description = get_input(printer, 'Description: ', STR_ALLOW_EMPTY)
     if not parsed_args.reminders and not parsed_args.default_reminders:
         while True:
-            r = get_input(
-                printer, 'Enter a valid reminder or ' '"." to end: ', REMINDER
-            )
+            r = get_input(printer, 'Enter a valid reminder or "." to end: ', REMINDER)
 
             if r == '.':
                 break
@@ -208,8 +203,9 @@ def main():
         parsed_args.config_folder = parsed_args.config_folder.expanduser()
 
     printer = Printer(
-            conky=parsed_args.conky, use_color=parsed_args.color,
-            art_style=parsed_args.lineart
+        conky=parsed_args.conky,
+        use_color=parsed_args.color,
+        art_style=parsed_args.lineart,
     )
 
     if unparsed:
@@ -256,20 +252,19 @@ def main():
 
         elif parsed_args.command == 'updates':
             gcal.UpdatesQuery(
-                    last_updated_datetime=parsed_args.since,
-                    start=parsed_args.start,
-                    end=parsed_args.end)
+                last_updated_datetime=parsed_args.since,
+                start=parsed_args.start,
+                end=parsed_args.end,
+            )
 
         elif parsed_args.command == 'conflicts':
             gcal.ConflictsQuery(
-                    search_text=parsed_args.text,
-                    start=parsed_args.start,
-                    end=parsed_args.end)
+                search_text=parsed_args.text, start=parsed_args.start, end=parsed_args.end
+            )
 
         elif parsed_args.command == 'calw':
             gcal.CalQuery(
-                    parsed_args.command, count=parsed_args.weeks,
-                    start_text=parsed_args.start
+                parsed_args.command, count=parsed_args.weeks, start_text=parsed_args.start
             )
 
         elif parsed_args.command == 'calm':
@@ -281,9 +276,7 @@ def main():
                 sys.exit(1)
 
             # allow unicode strings for input
-            gcal.QuickAddEvent(
-                    parsed_args.text, reminders=parsed_args.reminders
-            )
+            gcal.QuickAddEvent(parsed_args.text, reminders=parsed_args.reminders)
 
         elif parsed_args.command == 'add':
             if parsed_args.prompt:
@@ -295,46 +288,60 @@ def main():
                     parsed_args.when,
                     duration=parsed_args.duration,
                     end=parsed_args.end,
-                    allday=parsed_args.allday)
+                    allday=parsed_args.allday,
+                )
             except ValueError as exc:
                 printer.err_msg(str(exc))
                 # Since we actually need a valid start and end time in order to
                 # add the event, we cannot proceed.
                 raise
 
-            gcal.AddEvent(parsed_args.title, parsed_args.where, estart, eend,
-                          parsed_args.description, parsed_args.who,
-                          parsed_args.reminders, parsed_args.event_color)
+            gcal.AddEvent(
+                parsed_args.title,
+                parsed_args.where,
+                estart,
+                eend,
+                parsed_args.description,
+                parsed_args.who,
+                parsed_args.reminders,
+                parsed_args.event_color,
+            )
 
         elif parsed_args.command == 'search':
             gcal.TextQuery(
-                    parsed_args.text[0], start=parsed_args.start,
-                    end=parsed_args.end
+                parsed_args.text[0], start=parsed_args.start, end=parsed_args.end
             )
 
         elif parsed_args.command == 'delete':
             gcal.ModifyEvents(
-                    gcal._delete_event, parsed_args.text[0],
-                    start=parsed_args.start, end=parsed_args.end,
-                    expert=parsed_args.iamaexpert
+                gcal._delete_event,
+                parsed_args.text[0],
+                start=parsed_args.start,
+                end=parsed_args.end,
+                expert=parsed_args.iamaexpert,
             )
 
         elif parsed_args.command == 'edit':
             gcal.ModifyEvents(
-                    gcal._edit_event, parsed_args.text[0],
-                    start=parsed_args.start, end=parsed_args.end
+                gcal._edit_event,
+                parsed_args.text[0],
+                start=parsed_args.start,
+                end=parsed_args.end,
             )
 
         elif parsed_args.command == 'remind':
             gcal.Remind(
-                    parsed_args.minutes, parsed_args.cmd,
-                    use_reminders=parsed_args.use_reminders
+                parsed_args.minutes,
+                parsed_args.cmd,
+                use_reminders=parsed_args.use_reminders,
             )
 
         elif parsed_args.command == 'import':
             gcal.ImportICS(
-                    parsed_args.verbose, parsed_args.dump,
-                    parsed_args.reminders, parsed_args.file
+                parsed_args.verbose,
+                parsed_args.dump,
+                parsed_args.reminders,
+                parsed_args.file,
             )
 
         elif parsed_args.command == 'config':
@@ -360,35 +367,33 @@ def main():
                 print(json.dumps(schema, indent=2))
             elif parsed_args.subcommand == 'reset-cache':
                 deleted_something = False
-                for (cache_filepath, _) in env.data_file_paths(
+                for cache_filepath, _ in env.data_file_paths(
                     'cache', parsed_args.config_folder
                 ):
                     if cache_filepath.exists():
-                        printer.msg(
-                            f'Deleting cache file from {cache_filepath}...\n'
-                        )
+                        printer.msg(f'Deleting cache file from {cache_filepath}...\n')
                         cache_filepath.unlink(missing_ok=True)
                         deleted_something = True
                 if not deleted_something:
                     printer.msg(
-                        'No cache file found. Exiting without deleting '
-                        'anything...\n'
+                        'No cache file found. Exiting without deleting anything...\n'
                     )
             elif parsed_args.subcommand == 'inspect-auth':
                 auth_data = utils.inspect_auth()
                 for k, v in auth_data.items():
-                    printer.msg(f"{k}: {v}\n")
+                    printer.msg(f'{k}: {v}\n')
                 if auth_data.get('format', 'unknown') != 'unknown':
                     printer.msg(
-                        "\n"
+                        '\n'
                         "The grant's entry under "
-                        "https://myaccount.google.com/connections should also "
-                        "list creation time and other info Google provides on "
-                        "the access grant.\n"
+                        'https://myaccount.google.com/connections should also '
+                        'list creation time and other info Google provides on '
+                        'the access grant.\n'
                         'Hint: filter by "Access to: Calendar" if you have '
-                        "trouble finding the right one.\n")
+                        'trouble finding the right one.\n'
+                    )
                 else:
-                    printer.err_msg("No existing auth token found\n")
+                    printer.err_msg('No existing auth token found\n')
 
     except GcalcliError as exc:
         printer.err_msg(str(exc))
@@ -399,12 +404,8 @@ def set_resolved_calendars(parsed_args, printer: Printer) -> list[str]:
     multiple_allowed = not hasattr(parsed_args, 'calendar')
 
     # Reflect .calendar into .calendars (as list).
-    if hasattr(parsed_args, 'calendar') and not hasattr(
-        parsed_args, 'calendars'
-    ):
-        parsed_args.calendars = (
-            [parsed_args.calendar] if parsed_args.calendar else []
-        )
+    if hasattr(parsed_args, 'calendar') and not hasattr(parsed_args, 'calendars'):
+        parsed_args.calendars = [parsed_args.calendar] if parsed_args.calendar else []
     # If command didn't request calendar or calendars, bail out with empty list.
     # Note: this means if you forget parents=[calendar_parser] on a subparser,
     # you'll hit this case and any global/default cals will be ignored.
@@ -419,8 +420,8 @@ def set_resolved_calendars(parsed_args, printer: Printer) -> list[str]:
             if len(cals) > 1 and not multiple_allowed:
                 printer.debug_msg(
                     f"Can't use multiple {cals_type} for command "
-                    f"`{parsed_args.command}`. Must select --calendar "
-                    "explicitly.\n"
+                    f'`{parsed_args.command}`. Must select --calendar '
+                    'explicitly.\n'
                 )
                 continue
             if cals:
@@ -439,9 +440,7 @@ def set_resolved_calendars(parsed_args, printer: Printer) -> list[str]:
     cal_names = parse_cal_names(parsed_args.calendars, printer=printer)
     # Only ignore calendars if they're not explicitly in --calendar list.
     parsed_args.ignore_calendars[:] = [
-        c
-        for c in parsed_args.ignore_calendars
-        if c not in [c2.name for c2 in cal_names]
+        c for c in parsed_args.ignore_calendars if c not in [c2.name for c2 in cal_names]
     ]
 
     return cal_names

@@ -24,6 +24,5 @@ class ReadonlyCheckError(ReadonlyError):
 
 def raise_one_cal_error(cals):
     raise GcalcliError(
-        'You must only specify a single calendar\n'
-        'Calendars: {}\n'.format(cals)
+        'You must only specify a single calendar\nCalendars: {}\n'.format(cals)
     )

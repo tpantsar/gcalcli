@@ -58,8 +58,7 @@ PROGRAM_OPTIONS = {
         'type': str,
         'action': 'append',
         'dest': 'default_calendars',
-        'help': 'Optional default calendar to use if no --calendar options are '
-        'given',
+        'help': 'Optional default calendar to use if no --calendar options are given',
     },
     '--locale': {'default': '', 'type': str, 'help': 'System locale'},
     '--refresh': {
@@ -108,20 +107,16 @@ class DetailsAction(argparse._AppendAction):
 
 
 def validwidth(value):
-    minwidth=30
+    minwidth = 30
     ival = int(value)
     if ival < minwidth:
-        raise argparse.ArgumentTypeError(
-            'Width must be a number >= %d' % minwidth
-        )
+        raise argparse.ArgumentTypeError('Width must be a number >= %d' % minwidth)
     return ival
 
 
 def validreminder(value):
     if not utils.parse_reminder(value):
-        raise argparse.ArgumentTypeError(
-            'Not a valid reminder string: %s' % value
-        )
+        raise argparse.ArgumentTypeError('Not a valid reminder string: %s' % value)
     else:
         return value
 
@@ -253,9 +248,7 @@ def get_color_parser():
 
     for arg, color, msg in COLOR_PARSER_OPTIONS:
         arg = '--color-' + arg
-        color_parser.add_argument(
-            arg, default=color, type=valid_color_name, help=msg
-        )
+        color_parser.add_argument(arg, default=color, type=valid_color_name, help=msg)
 
     return color_parser
 
@@ -311,9 +304,7 @@ def get_cal_query_parser():
 def get_updates_parser():
     updates_parser = argparse.ArgumentParser(add_help=False)
     updates_parser.add_argument('since', type=utils.get_time_from_str)
-    updates_parser.add_argument(
-        'start', type=utils.get_time_from_str, nargs='?'
-    )
+    updates_parser.add_argument('start', type=utils.get_time_from_str, nargs='?')
     updates_parser.add_argument('end', type=utils.get_time_from_str, nargs='?')
     return updates_parser
 
@@ -322,12 +313,8 @@ def get_conflicts_parser():
     # optional search text, start and end filters
     conflicts_parser = argparse.ArgumentParser(add_help=False)
     conflicts_parser.add_argument('text', nargs='?', type=str)
-    conflicts_parser.add_argument(
-        'start', type=utils.get_time_from_str, nargs='?'
-    )
-    conflicts_parser.add_argument(
-        'end', type=utils.get_time_from_str, nargs='?'
-    )
+    conflicts_parser.add_argument('start', type=utils.get_time_from_str, nargs='?')
+    conflicts_parser.add_argument('end', type=utils.get_time_from_str, nargs='?')
     return conflicts_parser
 
 
@@ -472,7 +459,7 @@ def get_argument_parser():
             search_parser,
         ],
         help='search for events within an optional time period',
-        description='Provides case insensitive search for calendar ' 'events.',
+        description='Provides case insensitive search for calendar events.',
     )
     sub.add_parser(
         'edit',
@@ -483,20 +470,16 @@ def get_argument_parser():
             search_parser,
         ],
         help='edit calendar events',
-        description='Case insensitive search for items to find and edit '
-        'interactively.',
+        description='Case insensitive search for items to find and edit interactively.',
     )
 
     delete = sub.add_parser(
         'delete',
         parents=[calendars_parser, output_parser, search_parser],
         help='delete events from the calendar',
-        description='Case insensitive search for items to delete '
-        'interactively.',
+        description='Case insensitive search for items to delete interactively.',
     )
-    delete.add_argument(
-        '--iamaexpert', action='store_true', help='Probably not'
-    )
+    delete.add_argument('--iamaexpert', action='store_true', help='Probably not')
 
     sub.add_parser(
         'agenda',
@@ -579,7 +562,7 @@ def get_argument_parser():
         'quick',
         parents=[calendar_parser, details_parser, remind_parser],
         help='quick-add an event to a calendar',
-        description='`quick-add\' an event to a calendar. A single '
+        description="`quick-add' an event to a calendar. A single "
         '--calendar must be specified.',
     )
     quick.add_argument('text')
@@ -627,9 +610,7 @@ def get_argument_parser():
         type=str,
         help='Event ending time. Alternative to --duration.',
     )
-    add.add_argument(
-        '--description', default=None, type=str, help='Event description'
-    )
+    add.add_argument('--description', default=None, type=str, help='Event description')
     add.add_argument(
         '--allday',
         action='store_true',
@@ -644,7 +625,7 @@ def get_argument_parser():
         action='store_false',
         dest='prompt',
         default=True,
-        help='Don\'t prompt for missing data when adding events',
+        help="Don't prompt for missing data when adding events",
     )
 
     _import = sub.add_parser(
@@ -661,14 +642,12 @@ def get_argument_parser():
         nargs='?',
         default=None,
     )
-    _import.add_argument(
-        '--verbose', '-v', action='count', help='Be verbose on imports'
-    )
+    _import.add_argument('--verbose', '-v', action='count', help='Be verbose on imports')
     _import.add_argument(
         '--dump',
         '-d',
         action='store_true',
-        help='Print events and don\'t import',
+        help="Print events and don't import",
     )
     _import.add_argument(
         '--use-legacy-import',
@@ -716,8 +695,7 @@ def get_argument_parser():
 
     util = sub.add_parser(
         'util',
-        help='low-level utility commands for introspection, dumping schemas, '
-        'etc',
+        help='low-level utility commands for introspection, dumping schemas, etc',
     )
     util_sub = util.add_subparsers(
         dest='subcommand',
@@ -732,13 +710,13 @@ def get_argument_parser():
         'reset-cache',
         help='manually erase the cache',
         description="Delete gcalcli's internal cache file as a workaround for "
-        "caching bugs like insanum/gcalcli#622",
+        'caching bugs like insanum/gcalcli#622',
     )
     util_sub.add_parser(
         'inspect-auth',
         help='show metadata about auth token',
-        description="Dump metadata about the saved auth token gcalcli is set "
-        "up to use for you",
+        description='Dump metadata about the saved auth token gcalcli is set '
+        'up to use for you',
     )
 
     # Enrich with argcomplete options.

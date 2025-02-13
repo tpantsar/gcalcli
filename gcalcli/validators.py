@@ -3,16 +3,26 @@ from typing import Optional
 
 from .exceptions import ValidationError
 from .utils import (
+    REMINDER_REGEX,
     get_time_from_str,
     get_timedelta_from_str,
-    REMINDER_REGEX,
 )
 
 # TODO: in the future, pull these from the API
 # https://developers.google.com/calendar/v3/reference/colors
-VALID_OVERRIDE_COLORS = ['lavender', 'sage', 'grape', 'flamingo',
-                         'banana', 'tangerine', 'peacock', 'graphite',
-                         'blueberry', 'basil', 'tomato']
+VALID_OVERRIDE_COLORS = [
+    'lavender',
+    'sage',
+    'grape',
+    'flamingo',
+    'banana',
+    'tangerine',
+    'peacock',
+    'graphite',
+    'blueberry',
+    'basil',
+    'tomato',
+]
 
 DATE_INPUT_DESCRIPTION = '\
 a date (e.g. 2019-12-31, tomorrow 10am, 2nd Jan, Jan 4th, etc) or valid time \
@@ -51,9 +61,10 @@ def color_validator(input_str):
         return input_str
     except AssertionError:
         raise ValidationError(
-                'Expected colors are: ' +
-                ', '.join(color for color in VALID_OVERRIDE_COLORS) +
-                '. (Ctrl-C to exit)\n')
+            'Expected colors are: '
+            + ', '.join(color for color in VALID_OVERRIDE_COLORS)
+            + '. (Ctrl-C to exit)\n'
+        )
 
 
 def str_to_int_validator(input_str):
@@ -66,9 +77,7 @@ def str_to_int_validator(input_str):
         int(input_str)
         return input_str
     except ValueError:
-        raise ValidationError(
-            'Input here must be a number. (Ctrl-C to exit)\n'
-        )
+        raise ValidationError('Input here must be a number. (Ctrl-C to exit)\n')
 
 
 def parsable_date_validator(input_str):
@@ -82,8 +91,7 @@ def parsable_date_validator(input_str):
         return input_str
     except ValueError:
         raise ValidationError(
-            f'Expected format: {DATE_INPUT_DESCRIPTION}. '
-            '(Ctrl-C to exit)\n'
+            f'Expected format: {DATE_INPUT_DESCRIPTION}. (Ctrl-C to exit)\n'
         )
 
 
@@ -98,8 +106,7 @@ def parsable_duration_validator(input_str):
         return input_str
     except ValueError:
         raise ValidationError(
-            'Expected format: a duration (e.g. 1m, 1s, 1h3m)'
-            '(Ctrl-C to exit)\n'
+            'Expected format: a duration (e.g. 1m, 1s, 1h3m)(Ctrl-C to exit)\n'
         )
 
 
@@ -117,9 +124,7 @@ def non_blank_str_validator(input_str):
     Raises ValidationError otherwise.
     """
     if input_str in [None, '']:
-        raise ValidationError(
-            'Input here cannot be empty. (Ctrl-C to exit)\n'
-        )
+        raise ValidationError('Input here cannot be empty. (Ctrl-C to exit)\n')
     else:
         return input_str
 
@@ -133,8 +138,9 @@ def reminder_validator(input_str):
     if match or input_str == '.':
         return input_str
     else:
-        raise ValidationError('Expected format: <number><w|d|h|m> '
-                              '<popup|email|sms>. (Ctrl-C to exit)\n')
+        raise ValidationError(
+            'Expected format: <number><w|d|h|m> <popup|email|sms>. (Ctrl-C to exit)\n'
+        )
 
 
 STR_NOT_EMPTY = non_blank_str_validator

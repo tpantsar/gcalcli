@@ -4,12 +4,14 @@
 # must have underscore so as not to shadow stdlib types.py
 
 from datetime import datetime
-from typing import Any, TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 if TYPE_CHECKING:
     from googleapiclient._apis.calendar.v3.schemas import (  # type: ignore
         CalendarListEntry,
-        Event as GoogleEvent
+    )
+    from googleapiclient._apis.calendar.v3.schemas import (
+        Event as GoogleEvent,
     )
 
     class Event(GoogleEvent):

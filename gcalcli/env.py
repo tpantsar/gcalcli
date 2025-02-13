@@ -12,9 +12,9 @@ def default_data_dir() -> pathlib.Path:
 
 
 def data_file_paths(
-        name: str,
-        config_dir: Optional[pathlib.Path] = None,
-    ) -> list[Tuple[pathlib.Path, int]]:
+    name: str,
+    config_dir: Optional[pathlib.Path] = None,
+) -> list[Tuple[pathlib.Path, int]]:
     """Return all paths actively used for the given data file name.
 
     The paths are returned as tuples in order of decreasing precedence like:

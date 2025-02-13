@@ -14,10 +14,9 @@ class ShowConflicts:
         """Events must be passed in chronological order"""
         start = latest_event['s']
         for event in self.active_events:
-            if (event['e'] > start):
+            if event['e'] > start:
                 self.show(event)
-        self.active_events = list(
-            filter(lambda e: e['e'] > start, self.active_events))
+        self.active_events = list(filter(lambda e: e['e'] > start, self.active_events))
         self.active_events.append(latest_event)
 
     def _default_show(self, e):

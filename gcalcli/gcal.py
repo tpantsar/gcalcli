@@ -1,8 +1,4 @@
-from collections import namedtuple
-from csv import DictReader, excel_tab
-from datetime import date, datetime, timedelta
 import functools
-from itertools import chain
 import json
 import os
 import pathlib
@@ -13,6 +9,10 @@ import shutil
 import sys
 import textwrap
 import time
+from collections import namedtuple
+from csv import DictReader, excel_tab
+from datetime import date, datetime, timedelta
+from itertools import chain
 from typing import Any, Iterable
 from unicodedata import east_asian_width
 
@@ -27,13 +27,21 @@ from . import actions, auth, config, env, ics, utils
 from ._types import Cache, CalendarListEntry, Event
 from .actions import ACTIONS
 from .conflicts import ShowConflicts
-from .details import _valid_title, ACTION_DEFAULT, DETAILS_DEFAULT, HANDLERS
+from .details import ACTION_DEFAULT, DETAILS_DEFAULT, HANDLERS, _valid_title
 from .exceptions import GcalcliError
 from .printer import Printer
 from .utils import days_since_epoch, is_all_day
-from .validators import (get_input, get_override_color_id, PARSABLE_DATE,
-                         PARSABLE_DURATION, REMINDER, STR_ALLOW_EMPTY,
-                         STR_NOT_EMPTY, STR_TO_INT, VALID_COLORS)
+from .validators import (
+    PARSABLE_DATE,
+    PARSABLE_DURATION,
+    REMINDER,
+    STR_ALLOW_EMPTY,
+    STR_NOT_EMPTY,
+    STR_TO_INT,
+    VALID_COLORS,
+    get_input,
+    get_override_color_id,
+)
 
 try:
     import cPickle as pickle  # type: ignore
@@ -87,13 +95,13 @@ class GoogleCalendarInterface:
         self.days = 7 if self.options.get('cal_weekend', True) else 5
         # Store overall calendar width and width for day table cells
         self.width['cal'] = int(options.get('width', 80))
-        day_width = int(( self.width['cal'] - self.days - 1) / self.days)
+        day_width = int((self.width['cal'] - self.days - 1) / self.days)
         # Minimal day table cell is 10
         self.width['day'] = day_width if day_width > 9 else 10
 
         if self.userless_mode:
             print(
-                "Running in GCALCLI_USERLESS_MODE. Most operations will fail!",
+                'Running in GCALCLI_USERLESS_MODE. Most operations will fail!',
                 file=sys.stderr,
             )
         elif do_eager_init:
@@ -107,8 +115,7 @@ class GoogleCalendarInterface:
 
         if not selected_names:
             ignore_cals = self.options['ignore_calendars']
-            self.cals = [c for c in self.all_cals
-                         if c['summary'] not in ignore_cals]
+            self.cals = [c for c in self.all_cals if c['summary'] not in ignore_cals]
             return
 
         for cal_name in selected_names:
@@ -139,10 +146,10 @@ class GoogleCalendarInterface:
             except HttpError as e:
                 error = json.loads(e.content)
                 error = error.get('error')
-                if error.get('code') == '403' and \
-                        error.get('errors')[0].get('reason') \
-                        in ['rateLimitExceeded', 'userRateLimitExceeded']:
-                    time.sleep((2 ** n) + random.random())
+                if error.get('code') == '403' and error.get('errors')[0].get(
+                    'reason'
+                ) in ['rateLimitExceeded', 'userRateLimitExceeded']:
+                    time.sleep((2**n) + random.random())
                 else:
                     raise
 
@@ -153,7 +160,7 @@ class GoogleCalendarInterface:
         paths = env.data_file_paths(name, self.options.get('config_folder'))
         primary_path = None
         legacy_path = None
-        for (path, category) in paths:
+        for path, category in paths:
             if path.exists():
                 if category >= 0:
                     return path
@@ -214,9 +221,9 @@ class GoogleCalendarInterface:
                 if not self.credentials:
                     self.printer.err_msg(
                         f"Couldn't parse {oauth_filepath}.\n"
-                        "The file may be corrupt or be incompatible with "
-                        "this version of gcalcli. It probably has to be "
-                        "removed and provisioning done again.\n"
+                        'The file may be corrupt or be incompatible with '
+                        'this version of gcalcli. It probably has to be '
+                        'removed and provisioning done again.\n'
                     )
                     raise e
         if needs_write:
@@ -242,7 +249,8 @@ class GoogleCalendarInterface:
                         '{oauth} to {bak}\n'.format(
                             oauth=utils.shorten_path(oauth_filepath),
                             bak=utils.shorten_path(backup_filepath),
-                        ))
+                        )
+                    )
                     oauth_filepath.rename(backup_filepath)
                 cache_filepath = self.data_file_path('cache')
                 cache_filepath.unlink(missing_ok=True)
@@ -279,8 +287,7 @@ class GoogleCalendarInterface:
                 self.printer.msg('Client Secret: ', 'magenta')
                 client_secret = input()
             self.printer.msg(
-                'Now click the link below and follow directions to '
-                'authenticate.\n',
+                'Now click the link below and follow directions to authenticate.\n',
                 'yellow',
             )
             self.printer.msg(
@@ -289,8 +296,7 @@ class GoogleCalendarInterface:
             )
             if self.userless_mode:
                 self.printer.msg(
-                    'Skipping actual authentication (running in userless '
-                    'mode)\n'
+                    'Skipping actual authentication (running in userless mode)\n'
                 )
                 return
             self.credentials = auth.authenticate(
@@ -344,8 +350,7 @@ class GoogleCalendarInterface:
         page_token = None
         while True:
             cal_list = self._retry_with_backoff(
-                self.get_cal_service().calendarList().list(
-                    pageToken=page_token)
+                self.get_cal_service().calendarList().list(pageToken=page_token)
             )
 
             self.all_cals.extend(cal_list['items'])
@@ -373,7 +378,7 @@ class GoogleCalendarInterface:
             '8': 'brightblack',
             '9': 'blue',
             '10': 'green',
-            '11': 'red'
+            '11': 'red',
         }
         if event.get('gcalcli_cal') is None:
             return 'default'
@@ -400,8 +405,10 @@ class GoogleCalendarInterface:
         Evaluates a date against week_start and cal_weekend options and returns
         a day number starting from sunday=0 or monday=0."""
         day_num = int(day.strftime('%w'))
-        if (self.options['week_start'] == config.WeekStart.MONDAY
-                or not self.options['cal_weekend']):
+        if (
+            self.options['week_start'] == config.WeekStart.MONDAY
+            or not self.options['cal_weekend']
+        ):
             # Shift to count starting from monday (subtract 1, mod 7)
             day_num = (day_num - 1 + 7) % 7
         return day_num
@@ -419,17 +426,20 @@ class GoogleCalendarInterface:
         elif self.options['military']:
             return ' '.join([event['s'].strftime('%H:%M'), titlestr])
         else:
-            return ' '.join([event['s'].strftime('%I:%M').lstrip('0') +
-                            event['s'].strftime('%p').lower(), titlestr])
+            return ' '.join(
+                [
+                    event['s'].strftime('%I:%M').lstrip('0')
+                    + event['s'].strftime('%p').lower(),
+                    titlestr,
+                ]
+            )
 
     def _add_reminders(self, event, reminders=None):
         if reminders or not self.options['default_reminders']:
-            event['reminders'] = {'useDefault': False,
-                                  'overrides': []}
+            event['reminders'] = {'useDefault': False, 'overrides': []}
             for r in reminders:
                 n, m = utils.parse_reminder(r)
-                event['reminders']['overrides'].append({'minutes': n,
-                                                        'method': m})
+                event['reminders']['overrides'].append({'minutes': n, 'method': m})
         return event
 
     def _get_week_events(self, start_dt, end_dt, event_list):
@@ -451,12 +461,10 @@ class GoogleCalendarInterface:
                 # necessary to lower it by one day
                 event_end_date = event['e'] - timedelta(days=1)
 
-            event_is_today = self._event_time_in_range(
-                    event['s'], start_dt, end_dt
-            )
+            event_is_today = self._event_time_in_range(event['s'], start_dt, end_dt)
 
             event_continues_today = self._event_spans_time(
-                    event['s'], event_end_date, start_dt
+                event['s'], event_end_date, start_dt
             )
 
             # NOTE(slawqo): it's necessary to process events which starts in
@@ -467,13 +475,12 @@ class GoogleCalendarInterface:
                 color_as_now_marker = False
 
                 if now_in_week and not now_marker_printed:
-                    if (days_since_epoch(self.now) <
-                            days_since_epoch(event['s'])):
+                    if days_since_epoch(self.now) < days_since_epoch(event['s']):
                         week_events[event_daynum].append(
-                                EventTitle(
-                                    '\n' + self.width['day'] * '-',
-                                    self.options['color_now_marker']
-                                )
+                            EventTitle(
+                                '\n' + self.width['day'] * '-',
+                                self.options['color_now_marker'],
+                            )
                         )
                         now_marker_printed = True
 
@@ -482,9 +489,11 @@ class GoogleCalendarInterface:
                     # into the wrong day.  This resolves the issue by skipping
                     # all day events for specific coloring but not for previous
                     # or next events
-                    elif self.now >= event['s'] and \
-                            self.now <= event_end_date and \
-                            not event_allday:
+                    elif (
+                        self.now >= event['s']
+                        and self.now <= event_end_date
+                        and not event_allday
+                    ):
                         # line marker is during the event (recolor event)
                         color_as_now_marker = True
                         now_marker_printed = True
@@ -493,9 +502,7 @@ class GoogleCalendarInterface:
                     event_color = self.options['color_now_marker']
                 else:
                     if self.options['override_color'] and event.get('colorId'):
-                        event_color = self._calendar_color(
-                                event, override_color=True
-                        )
+                        event_color = self._calendar_color(event, override_color=True)
                     else:
                         event_color = self._calendar_color(event)
 
@@ -510,14 +517,12 @@ class GoogleCalendarInterface:
                     if event_daynum > end_daynum:
                         event_daynum = 0
                     for day in range(event_daynum, end_daynum + 1):
-                        week_events[day].append(
-                                EventTitle('\n' + titlestr, event_color)
-                        )
+                        week_events[day].append(EventTitle('\n' + titlestr, event_color))
                 else:
                     # newline and empty string are the keys to turn off
                     # coloring
                     week_events[event_daynum].append(
-                            EventTitle('\n' + titlestr, event_color)
+                        EventTitle('\n' + titlestr, event_color)
                     )
         return week_events
 
@@ -526,9 +531,7 @@ class GoogleCalendarInterface:
         # us the info we want.  Date string were coming in as `str` type
         # so we convert them to unicode and then check their size. Fixes
         # the output issues we were seeing around non-US locale strings
-        return sum(
-                self.UNIWIDTH[east_asian_width(char)] for char in string
-        )
+        return sum(self.UNIWIDTH[east_asian_width(char)] for char in string)
 
     def _word_cut(self, word):
         stop = 0
@@ -564,8 +567,7 @@ class GoogleCalendarInterface:
         # newline in string is a special case
         idx = event_string.find('\n')
         if idx > -1 and idx <= self.width['day']:
-            return (self._printed_len(event_string[:idx]),
-                    len(event_string[:idx]))
+            return (self._printed_len(event_string[:idx]), len(event_string[:idx]))
 
         if print_len <= self.width['day']:
             return (print_len, len(event_string))
@@ -580,23 +582,24 @@ class GoogleCalendarInterface:
 
         color_border = self.options['color_border']
 
-        while (len(event_list) and event_list[0]['s'] < start_datetime):
+        while len(event_list) and event_list[0]['s'] < start_datetime:
             event_list = event_list[1:]
 
         day_width_line = self.width['day'] * self.printer.art['hrz']
         # Get the localized day names... January 1, 2001 was a Monday
-        day_names = [date(2001, 1, i + 1).strftime('%A')
-                    for i in range(self.days)]
-        if (self.options['week_start'] != config.WeekStart.MONDAY
-                or not self.options['cal_weekend']):
+        day_names = [date(2001, 1, i + 1).strftime('%A') for i in range(self.days)]
+        if (
+            self.options['week_start'] != config.WeekStart.MONDAY
+            or not self.options['cal_weekend']
+        ):
             day_names = day_names[6:] + day_names[:6]
 
         def build_divider(left, center, right):
             return (
-                self.printer.art[left] + day_width_line +
-                ( (self.days - 1) * (self.printer.art[center] +
-                    day_width_line) ) +
-                self.printer.art[right]
+                self.printer.art[left]
+                + day_width_line
+                + ((self.days - 1) * (self.printer.art[center] + day_width_line))
+                + self.printer.art[right]
             )
 
         week_top = build_divider('ulc', 'ute', 'urc')
@@ -627,9 +630,7 @@ class GoogleCalendarInterface:
         # weekday labels
         self.printer.art_msg('vrt', color_border)
         for day_name in day_names:
-            day_name += ' ' * (
-                    self.width['day'] - self._printed_len(day_name)
-            )
+            day_name += ' ' * (self.width['day'] - self._printed_len(day_name))
             self.printer.msg(day_name, self.options['color_date'])
             self.printer.art_msg('vrt', color_border)
 
@@ -639,26 +640,24 @@ class GoogleCalendarInterface:
         # get date range objects for the first week
         if cmd == 'calm':
             day_num = self._cal_weekday_num(start_datetime)
-            start_datetime = (start_datetime - timedelta(days=day_num))
+            start_datetime = start_datetime - timedelta(days=day_num)
         start_week_datetime = start_datetime
-        end_week_datetime = (start_week_datetime + timedelta(days=7))
+        end_week_datetime = start_week_datetime + timedelta(days=7)
 
         for i in range(count):
             # create and print the date line for a week
             for j in range(self.days):
                 if cmd == 'calw':
-                    d = (start_week_datetime +
-                         timedelta(days=j)).strftime('%d %b')
+                    d = (start_week_datetime + timedelta(days=j)).strftime('%d %b')
                 else:  # (cmd == 'calm'):
-                    d = (start_week_datetime +
-                         timedelta(days=j)).strftime('%d')
-                    if cur_month != (start_week_datetime +
-                                     timedelta(days=j)).strftime('%b'):
+                    d = (start_week_datetime + timedelta(days=j)).strftime('%d')
+                    if cur_month != (start_week_datetime + timedelta(days=j)).strftime(
+                        '%b'
+                    ):
                         d = ''
                 tmp_date_color = self.options['color_date']
 
-                fmt_now = (start_week_datetime +
-                           timedelta(days=j)).strftime('%d%b%Y')
+                fmt_now = (start_week_datetime + timedelta(days=j)).strftime('%d%b%Y')
                 if self.now.strftime('%d%b%Y') == fmt_now:
                     tmp_date_color = self.options['color_now_marker']
                     d += ' **'
@@ -673,12 +672,12 @@ class GoogleCalendarInterface:
             self.printer.msg('\n')
 
             week_events = self._get_week_events(
-                    start_week_datetime, end_week_datetime, event_list
+                start_week_datetime, end_week_datetime, event_list
             )
 
             # get date range objects for the next week
             start_week_datetime = end_week_datetime
-            end_week_datetime = (end_week_datetime + timedelta(days=7))
+            end_week_datetime = end_week_datetime + timedelta(days=7)
 
             while True:
                 # keep looping over events by day, printing one line at a time
@@ -689,8 +688,7 @@ class GoogleCalendarInterface:
                     if not week_events[j]:
                         # no events today
                         self.printer.msg(
-                                empty_day + self.printer.art['vrt'],
-                                color_border
+                            empty_day + self.printer.art['vrt'], color_border
                         )
                         continue
 
@@ -699,8 +697,7 @@ class GoogleCalendarInterface:
                     padding = ' ' * (self.width['day'] - print_len)
 
                     self.printer.msg(
-                            curr_event.title[:cut_idx] + padding,
-                            curr_event.color
+                        curr_event.title[:cut_idx] + padding, curr_event.color
                     )
 
                     # trim what we've already printed
@@ -709,8 +706,7 @@ class GoogleCalendarInterface:
                     if trimmed_title == '':
                         week_events[j].pop(0)
                     else:
-                        week_events[j][0] = \
-                                curr_event._replace(title=trimmed_title)
+                        week_events[j][0] = curr_event._replace(title=trimmed_title)
 
                     done = False
                     self.printer.art_msg('vrt', color_border)
@@ -728,12 +724,9 @@ class GoogleCalendarInterface:
         keys = set(self.details.keys())
         keys.update(DETAILS_DEFAULT)
 
-        handlers = [handler
-                    for key, handler in HANDLERS.items()
-                    if key in keys]
+        handlers = [handler for key, handler in HANDLERS.items() if key in keys]
 
-        header_row = chain.from_iterable(handler.fieldnames
-                                         for handler in handlers)
+        header_row = chain.from_iterable(handler.fieldnames for handler in handlers)
         print(*header_row, sep='\t')
 
         for event in event_list:
@@ -750,13 +743,12 @@ class GoogleCalendarInterface:
             print(output)
 
     def _PrintEvent(self, event, prefix):
-
         def _format_descr(descr, indent, box):
             wrapper = textwrap.TextWrapper()
             if box:
-                wrapper.initial_indent = (indent + '  ')
-                wrapper.subsequent_indent = (indent + '  ')
-                wrapper.width = (self.width['cal'] - 2)
+                wrapper.initial_indent = indent + '  '
+                wrapper.subsequent_indent = indent + '  '
+                wrapper.width = self.width['cal'] - 2
             else:
                 wrapper.initial_indent = indent
                 wrapper.subsequent_indent = indent
@@ -766,14 +758,14 @@ class GoogleCalendarInterface:
                 if box:
                     tmp_line = wrapper.fill(line)
                     for single_line in tmp_line.split('\n'):
-                        single_line = single_line.ljust(
-                                self.width['cal'], ' '
+                        single_line = single_line.ljust(self.width['cal'], ' ')
+                        new_descr += (
+                            single_line[: len(indent)]
+                            + self.printer.art['vrt']
+                            + single_line[(len(indent) + 1) : (self.width['cal'] - 1)]
+                            + self.printer.art['vrt']
+                            + '\n'
                         )
-                        new_descr += single_line[:len(indent)] + \
-                            self.printer.art['vrt'] + \
-                            single_line[(len(indent) + 1):
-                                        (self.width['cal'] - 1)] + \
-                            self.printer.art['vrt'] + '\n'
                 else:
                     new_descr += wrapper.fill(line) + '\n'
             return new_descr.rstrip()
@@ -793,37 +785,38 @@ class GoogleCalendarInterface:
             else:
                 event_color = self._calendar_color(event, override_color=True)
         else:
-            event_color = self.options['color_now_marker'] \
-                if happening_now and not all_day \
+            event_color = (
+                self.options['color_now_marker']
+                if happening_now and not all_day
                 else self._calendar_color(event)
+            )
 
         time_width = '%-5s' if self.options['military'] else '%-7s'
         if all_day:
             fmt = '  ' + time_width + '  %s\n'
-            self.printer.msg(
-                    fmt % ('', _valid_title(event).strip()),
-                    event_color
-            )
+            self.printer.msg(fmt % ('', _valid_title(event).strip()), event_color)
         else:
-            tmp_start_time_str = \
-                utils.agenda_time_fmt(event['s'], self.options['military'])
+            tmp_start_time_str = utils.agenda_time_fmt(
+                event['s'], self.options['military']
+            )
             tmp_end_time_str = ''
             fmt = '  ' + time_width + '   ' + time_width + '  %s\n'
 
             if self.details.get('end'):
-                tmp_end_time_str = \
-                    utils.agenda_time_fmt(event['e'], self.options['military'])
+                tmp_end_time_str = utils.agenda_time_fmt(
+                    event['e'], self.options['military']
+                )
                 fmt = '  ' + time_width + ' - ' + time_width + '  %s\n'
 
             self.printer.msg(
-                    fmt % (tmp_start_time_str, tmp_end_time_str,
-                           _valid_title(event).strip()),
-                    event_color
+                fmt % (tmp_start_time_str, tmp_end_time_str, _valid_title(event).strip()),
+                event_color,
             )
 
         if self.details.get('calendar'):
             xstr = '%s  Calendar: %s\n' % (
-                    details_indent, event['gcalcli_cal']['summary']
+                details_indent,
+                event['gcalcli_cal']['summary'],
             )
             self.printer.msg(xstr, 'default')
 
@@ -841,18 +834,19 @@ class GoogleCalendarInterface:
             for entry_point in event['conferenceData']['entryPoints']:
                 entry_point_type = entry_point['entryPointType']
                 hlink = entry_point['uri']
-                xstr = '%s  Conference Link: %s: %s\n' % (details_indent,
-                                                          entry_point_type,
-                                                          hlink)
+                xstr = '%s  Conference Link: %s: %s\n' % (
+                    details_indent,
+                    entry_point_type,
+                    hlink,
+                )
                 self.printer.msg(xstr, 'default')
 
-        if self.details.get('location') \
-                and 'location' in event \
-                and event['location'].strip():
-            xstr = '%s  Location: %s\n' % (
-                details_indent,
-                event['location'].strip()
-            )
+        if (
+            self.details.get('location')
+            and 'location' in event
+            and event['location'].strip()
+        ):
+            xstr = '%s  Location: %s\n' % (details_indent, event['location'].strip())
             self.printer.msg(xstr, 'default')
 
         if self.details.get('attendees') and 'attendees' in event:
@@ -862,9 +856,8 @@ class GoogleCalendarInterface:
             if 'self' not in event['organizer']:
                 xstr = '%s    %s: <%s>\n' % (
                     details_indent,
-                    event['organizer'].get('displayName', 'Not Provided')
-                                      .strip(),
-                    event['organizer'].get('email', 'Not Provided').strip()
+                    event['organizer'].get('displayName', 'Not Provided').strip(),
+                    event['organizer'].get('email', 'Not Provided').strip(),
                 )
                 self.printer.msg(xstr, 'default')
 
@@ -873,7 +866,7 @@ class GoogleCalendarInterface:
                     xstr = '%s    %s: <%s>\n' % (
                         details_indent,
                         attendee.get('displayName', 'Not Provided').strip(),
-                        attendee.get('email', 'Not Provided').strip()
+                        attendee.get('email', 'Not Provided').strip(),
                     )
                     self.printer.msg(xstr, 'default')
 
@@ -886,12 +879,12 @@ class GoogleCalendarInterface:
                     details_indent,
                     attendee.get('title', 'Not Provided').strip(),
                     details_indent,
-                    attendee.get('fileUrl', 'Not Provided').strip()
+                    attendee.get('fileUrl', 'Not Provided').strip(),
                 )
                 self.printer.msg(xstr, 'default')
 
         if self.details.get('length'):
-            diff_date_time = (event['e'] - event['s'])
+            diff_date_time = event['e'] - event['s']
             xstr = '%s  Length: %s\n' % (details_indent, diff_date_time)
             self.printer.msg(xstr, 'default')
 
@@ -901,69 +894,66 @@ class GoogleCalendarInterface:
                 self.printer.msg(xstr, 'default')
             elif 'overrides' in event['reminders']:
                 for rem in event['reminders']['overrides']:
-                    xstr = '%s  Reminder: %s %d minutes\n' % \
-                           (details_indent, rem['method'], rem['minutes'])
+                    xstr = '%s  Reminder: %s %d minutes\n' % (
+                        details_indent,
+                        rem['method'],
+                        rem['minutes'],
+                    )
                     self.printer.msg(xstr, 'default')
 
-        if self.details.get('email') \
-                and 'email' in event.get('creator', {}) \
-                and event['creator']['email'].strip():
-            xstr = '%s  Email: %s\n' % (
-                details_indent,
-                event['creator']['email'].strip()
-            )
+        if (
+            self.details.get('email')
+            and 'email' in event.get('creator', {})
+            and event['creator']['email'].strip()
+        ):
+            xstr = '%s  Email: %s\n' % (details_indent, event['creator']['email'].strip())
             self.printer.msg(xstr, 'default')
 
-        if self.details.get('description') \
-                and 'description' in event \
-                and event['description'].strip():
+        if (
+            self.details.get('description')
+            and 'description' in event
+            and event['description'].strip()
+        ):
             descr_indent = details_indent + '  '
             box = True  # leave old non-box code for option later
             if box:
                 top_marker = (
-                        descr_indent +
-                        self.printer.art['ulc'] +
-                        (self.printer.art['hrz'] *
-                            ((self.width['cal'] - len(descr_indent))
-                             - 2
-                             )
-                         ) +
-                        self.printer.art['urc']
+                    descr_indent
+                    + self.printer.art['ulc']
+                    + (
+                        self.printer.art['hrz']
+                        * ((self.width['cal'] - len(descr_indent)) - 2)
+                    )
+                    + self.printer.art['urc']
                 )
                 bot_marker = (
-                        descr_indent +
-                        self.printer.art['llc'] +
-                        (self.printer.art['hrz'] *
-                            ((self.width['cal'] - len(descr_indent))
-                             - 2
-                             )
-                         ) +
-                        self.printer.art['lrc']
+                    descr_indent
+                    + self.printer.art['llc']
+                    + (
+                        self.printer.art['hrz']
+                        * ((self.width['cal'] - len(descr_indent)) - 2)
+                    )
+                    + self.printer.art['lrc']
                 )
                 xstr = '%s  Description:\n%s\n%s\n%s\n' % (
                     details_indent,
                     top_marker,
-                    _format_descr(event['description'].strip(),
-                                  descr_indent, box),
-                    bot_marker
+                    _format_descr(event['description'].strip(), descr_indent, box),
+                    bot_marker,
                 )
             else:
-                marker = descr_indent + '-' * \
-                    (self.width['cal'] - len(descr_indent))
+                marker = descr_indent + '-' * (self.width['cal'] - len(descr_indent))
                 xstr = '%s  Description:\n%s\n%s\n%s\n' % (
                     details_indent,
                     marker,
-                    _format_descr(event['description'].strip(),
-                                  descr_indent, box),
-                    marker
+                    _format_descr(event['description'].strip(), descr_indent, box),
+                    marker,
                 )
             self.printer.msg(xstr, 'default')
 
     def delete(self, cal_id, event_id):
         self._retry_with_backoff(
-            self.get_events()
-                .delete(calendarId=cal_id,
-                        eventId=event_id)
+            self.get_events().delete(calendarId=cal_id, eventId=event_id)
         )
 
     def _delete_event(self, event):
@@ -999,27 +989,27 @@ class GoogleCalendarInterface:
         event['e'] - parse(end)
 
         if self.options.get('allday'):
-            event['start'] = {'date': start,
-                              'dateTime': None,
-                              'timeZone': None}
-            event['end'] = {'date': end,
-                            'dateTime': None,
-                            'timeZone': None}
+            event['start'] = {'date': start, 'dateTime': None, 'timeZone': None}
+            event['end'] = {'date': end, 'dateTime': None, 'timeZone': None}
         else:
-            event['start'] = {'date': None,
-                              'dateTime': start,
-                              'timeZone': event['gcalcli_cal']['timeZone']}
-            event['end'] = {'date': None,
-                            'dateTime': end,
-                            'timeZone': event['gcalcli_cal']['timeZone']}
+            event['start'] = {
+                'date': None,
+                'dateTime': start,
+                'timeZone': event['gcalcli_cal']['timeZone'],
+            }
+            event['end'] = {
+                'date': None,
+                'dateTime': end,
+                'timeZone': event['gcalcli_cal']['timeZone'],
+            }
         return event
 
     def _edit_event(self, event):
-
         while True:
             self.printer.msg(
-                    'Edit?\n[N]o [s]ave [q]uit [t]itle [l]ocation [w]hen ' +
-                    'len[g]th [r]eminder [c]olor [d]escr: ', 'magenta'
+                'Edit?\n[N]o [s]ave [q]uit [t]itle [l]ocation [w]hen '
+                + 'len[g]th [r]eminder [c]olor [d]escr: ',
+                'magenta',
             )
             val = input()
 
@@ -1035,19 +1025,25 @@ class GoogleCalendarInterface:
             elif val.lower() == 's':
                 # copy only editable event details for patching
                 mod_event = {}
-                keys = ['summary', 'location', 'start', 'end', 'reminders',
-                        'description', 'colorId']
+                keys = [
+                    'summary',
+                    'location',
+                    'start',
+                    'end',
+                    'reminders',
+                    'description',
+                    'colorId',
+                ]
                 for k in keys:
                     if k in event:
                         mod_event[k] = event[k]
 
                 self._retry_with_backoff(
-                    self.get_events()
-                        .patch(
-                            calendarId=event['gcalcli_cal']['id'],
-                            eventId=event['id'],
-                            body=mod_event
-                        )
+                    self.get_events().patch(
+                        calendarId=event['gcalcli_cal']['id'],
+                        eventId=event['id'],
+                        body=mod_event,
+                    )
                 )
                 self.printer.msg('Saved!\n', 'red')
                 return
@@ -1069,12 +1065,13 @@ class GoogleCalendarInterface:
             elif val.lower() == 'w':
                 val = get_input(self.printer, 'When: ', PARSABLE_DATE).strip()
                 if val:
-                    td = (event['e'] - event['s'])
-                    length = ((td.days * 1440) + (td.seconds / 60))
+                    td = event['e'] - event['s']
+                    length = (td.days * 1440) + (td.seconds / 60)
                     all_day = self.options.get('allday')
                     try:
                         new_start, new_end = utils.get_times_from_duration(
-                            val, duration=length, all_day=all_day)
+                            val, duration=length, all_day=all_day
+                        )
                     except ValueError as exc:
                         self.printer.err_msg(str(exc))
                         sys.exit(1)
@@ -1082,16 +1079,14 @@ class GoogleCalendarInterface:
 
             elif val.lower() == 'g':
                 val = get_input(
-                        self.printer, 'Length (mins or human readable): ',
-                        PARSABLE_DURATION
+                    self.printer, 'Length (mins or human readable): ', PARSABLE_DURATION
                 )
                 if val:
                     all_day = self.options.get('allday')
                 try:
                     new_start, new_end = utils.get_times_from_duration(
-                        event['start']['dateTime'],
-                        duration=val,
-                        all_day=all_day)
+                        event['start']['dateTime'], duration=val, all_day=all_day
+                    )
                     event = self._SetEventStartEnd(new_start, new_end, event)
                 except ValueError as exc:
                     self.printer.err_msg(str(exc))
@@ -1100,23 +1095,21 @@ class GoogleCalendarInterface:
                 rem = []
                 while True:
                     r = get_input(
-                            self.printer, "Enter a valid reminder or '.' to"
-                                          'end: ', REMINDER
+                        self.printer, "Enter a valid reminder or '.' toend: ", REMINDER
                     )
                     if r == '.':
                         break
                     rem.append(r)
 
                 if rem or not self.options['default_reminders']:
-                    event['reminders'] = {'useDefault': False,
-                                          'overrides': []}
+                    event['reminders'] = {'useDefault': False, 'overrides': []}
                     for r in rem:
                         n, m = utils.parse_reminder(r)
-                        event['reminders']['overrides'].append({'minutes': n,
-                                                                'method': m})
+                        event['reminders']['overrides'].append(
+                            {'minutes': n, 'method': m}
+                        )
                 else:
-                    event['reminders'] = {'useDefault': True,
-                                          'overrides': []}
+                    event['reminders'] = {'useDefault': True, 'overrides': []}
 
             elif val.lower() == 'd':
                 val = get_input(self.printer, 'Description: ', STR_ALLOW_EMPTY)
@@ -1128,13 +1121,9 @@ class GoogleCalendarInterface:
                 sys.stdout.write('\n')
                 sys.exit(1)
 
-            self._PrintEvent(
-                    event, event['s'].strftime('\n%Y-%m-%d')
-            )
+            self._PrintEvent(event, event['s'].strftime('\n%Y-%m-%d'))
 
-    def _iterate_events(self, start_datetime, event_list, year_date=False,
-                        work=None):
-
+    def _iterate_events(self, start_datetime, event_list, year_date=False, work=None):
         selected = 0
 
         if len(event_list) == 0:
@@ -1164,21 +1153,22 @@ class GoogleCalendarInterface:
 
         return selected
 
-    def _GetAllEvents(self, cal, start: datetime, end: datetime, search_text) -> Iterable[Event]:
+    def _GetAllEvents(
+        self, cal, start: datetime, end: datetime, search_text
+    ) -> Iterable[Event]:
         pageToken = None
         while True:
             events = self._retry_with_backoff(
-                    self.get_events()
-                    .list(
-                        calendarId=cal['id'],
-                        timeMin=start.isoformat() if start else None,
-                        timeMax=end.isoformat() if end else None,
-                        q=search_text if search_text else None,
-                        singleEvents=True,
-                        pageToken=pageToken)
-                    )
+                self.get_events().list(
+                    calendarId=cal['id'],
+                    timeMin=start.isoformat() if start else None,
+                    timeMax=end.isoformat() if end else None,
+                    q=search_text if search_text else None,
+                    singleEvents=True,
+                    pageToken=pageToken,
+                )
+            )
             for event in events.get('items', []):
-
                 event['gcalcli_cal'] = cal
 
                 if 'status' in event and event['status'] == 'cancelled':
@@ -1224,14 +1214,17 @@ class GoogleCalendarInterface:
         event_list = []
         for cal in self.cals:
             event_list.extend(
-                self._GetAllEvents(cal, start, end, search_text=search_text))
+                self._GetAllEvents(cal, start, end, search_text=search_text)
+            )
         event_list.sort(key=lambda x: x['s'])
         return event_list
 
     def _DeclinedEvent(self, event):
-        return any(a['responseStatus'] == 'declined'
-                   for a in event.get('attendees', [])
-                   if 'self' in a or a['email'] == event['gcalcli_cal']['id'])
+        return any(
+            a['responseStatus'] == 'declined'
+            for a in event.get('attendees', [])
+            if 'self' in a or a['email'] == event['gcalcli_cal']['id']
+        )
 
     def ListAllCalendars(self):
         access_len = max(len(cal['accessRole']) for cal in self.all_cals)
@@ -1239,12 +1232,8 @@ class GoogleCalendarInterface:
 
         _format = ' %0' + str(access_len) + 's  %s\n'
 
-        self.printer.msg(
-            _format % ('Access', 'Title'), self.options['color_title']
-        )
-        self.printer.msg(
-            _format % ('------', '-----'), self.options['color_title']
-        )
+        self.printer.msg(_format % ('Access', 'Title'), self.options['color_title'])
+        self.printer.msg(_format % ('------', '-----'), self.options['color_title'])
 
         for cal in self.all_cals:
             name = cal['summary']
@@ -1256,8 +1245,7 @@ class GoogleCalendarInterface:
                 self._calendar_color(cal),
             )
 
-    def _display_queried_events(self, start, end, search=None,
-                                year_date=False):
+    def _display_queried_events(self, start, end, search=None, year_date=False):
         event_list = self._search_for_events(start, end, search)
 
         if self.options.get('tsv'):
@@ -1280,15 +1268,19 @@ class GoogleCalendarInterface:
             end = (start + relativedelta(months=+1)).replace(day=1)
 
         event_list = self._search_for_events(start, end, None)
-        event_list = [e for e in event_list
-                      if (utils.get_time_from_str(e['updated']) >=
-                          last_updated_datetime)]
-        print('Updates since:',
-              last_updated_datetime,
-              'events starting',
-              start,
-              'until',
-              end)
+        event_list = [
+            e
+            for e in event_list
+            if (utils.get_time_from_str(e['updated']) >= last_updated_datetime)
+        ]
+        print(
+            'Updates since:',
+            last_updated_datetime,
+            'events starting',
+            start,
+            'until',
+            end,
+        )
         return self._iterate_events(start, event_list, year_date=False)
 
     def ConflictsQuery(self, search_text='', start=None, end=None):
@@ -1296,23 +1288,21 @@ class GoogleCalendarInterface:
             start = self.now.replace(hour=0, minute=0, second=0, microsecond=0)
 
         if not end:
-            end = (start + timedelta(days=self.conflicts_lookahead_days))
+            end = start + timedelta(days=self.conflicts_lookahead_days)
 
         event_list = self._search_for_events(start, end, search_text)
-        show_conflicts = ShowConflicts(
-                            lambda e: self._PrintEvent(e, '\t !!! Conflict: '))
+        show_conflicts = ShowConflicts(lambda e: self._PrintEvent(e, '\t !!! Conflict: '))
 
-        return self._iterate_events(start,
-                                    event_list,
-                                    year_date=False,
-                                    work=show_conflicts.show_conflicts)
+        return self._iterate_events(
+            start, event_list, year_date=False, work=show_conflicts.show_conflicts
+        )
 
     def AgendaQuery(self, start=None, end=None):
         if not start:
             start = self.now.replace(hour=0, minute=0, second=0, microsecond=0)
 
         if not end:
-            end = (start + timedelta(days=self.agenda_length))
+            end = start + timedelta(days=self.agenda_length)
 
         return self._display_queried_events(start, end)
 
@@ -1334,28 +1324,25 @@ class GoogleCalendarInterface:
     def CalQuery(self, cmd, start_text='', count=1):
         if not start_text:
             # convert now to midnight this morning and use for default
-            start = self.now.replace(hour=0,
-                                     minute=0,
-                                     second=0,
-                                     microsecond=0)
+            start = self.now.replace(hour=0, minute=0, second=0, microsecond=0)
         else:
             try:
                 start = utils.get_time_from_str(start_text)
-                start = start.replace(hour=0, minute=0, second=0,
-                                      microsecond=0)
+                start = start.replace(hour=0, minute=0, second=0, microsecond=0)
             except Exception:
                 self.printer.err_msg(
-                    f'Error: failed to parse start time {start_text!r}\n')
+                    f'Error: failed to parse start time {start_text!r}\n'
+                )
                 return
 
         # convert start date to the beginning of the week or month
         if cmd == 'calw':
             day_num = self._cal_weekday_num(start)
-            start = (start - timedelta(days=day_num))
-            end = (start + timedelta(days=(count * 7)))
+            start = start - timedelta(days=day_num)
+            end = start + timedelta(days=(count * 7))
         else:  # cmd == 'calm':
-            start = (start - timedelta(days=(start.day - 1)))
-            end_month = (start.month + 1)
+            start = start - timedelta(days=(start.day - 1))
+            end_month = start.month + 1
             end_year = start.year
             if end_month == 13:
                 end_month = 1
@@ -1367,7 +1354,7 @@ class GoogleCalendarInterface:
             if self.options['week_start'] == config.WeekStart.MONDAY:
                 # Shift to count starting from monday (subtract 1, mod 7)
                 offset_days = (offset_days - 1 + 7) % 7
-            total_days = (days_in_month + offset_days)
+            total_days = days_in_month + offset_days
             count = int(total_days / 7)
             if total_days % 7:
                 count += 1
@@ -1383,18 +1370,18 @@ class GoogleCalendarInterface:
             return cals[0]
         # Calendar not specified. Prompt the user to select it
         writers = (self.ACCESS_OWNER, self.ACCESS_WRITER)
-        cals_with_write_perms = [cal for cal in self.cals
-                                 if cal['accessRole'] in writers]
+        cals_with_write_perms = [cal for cal in self.cals if cal['accessRole'] in writers]
 
-        print('\n'.join(f"{idx} {cal['summary']}"
-                        for idx, cal in enumerate(cals_with_write_perms)))
-        val = get_input(self.printer, 'Specify calendar from above: ',
-                        STR_TO_INT)
+        print(
+            '\n'.join(
+                f'{idx} {cal["summary"]}' for idx, cal in enumerate(cals_with_write_perms)
+            )
+        )
+        val = get_input(self.printer, 'Specify calendar from above: ', STR_TO_INT)
         try:
             return cals_with_write_perms[int(val)]
         except IndexError:
-            raise GcalcliError(
-                f'Invalid selection from the list above: {val}\n')
+            raise GcalcliError(f'Invalid selection from the list above: {val}\n')
 
     def QuickAddEvent(self, event_text, reminders=None):
         """Wrapper around Google Calendar API's quickAdd"""
@@ -1404,30 +1391,21 @@ class GoogleCalendarInterface:
         calendar = self._prompt_for_calendar(self.cals)
 
         new_event = self._retry_with_backoff(
-            self.get_events()
-                .quickAdd(
-                    calendarId=calendar['id'],
-                    text=event_text
-                )
+            self.get_events().quickAdd(calendarId=calendar['id'], text=event_text)
         )
 
         if reminders or not self.options['default_reminders']:
             rem = {}
-            rem['reminders'] = {'useDefault': False,
-                                'overrides': []}
+            rem['reminders'] = {'useDefault': False, 'overrides': []}
             for r in reminders:
                 n, m = utils.parse_reminder(r)
-                rem['reminders']['overrides'].append({'minutes': n,
-                                                      'method': m})
+                rem['reminders']['overrides'].append({'minutes': n, 'method': m})
 
             new_event = self._retry_with_backoff(
-                            self.get_events()
-                                .patch(
-                                    calendarId=calendar['id'],
-                                    eventId=new_event['id'],
-                                    body=rem
-                                )
-                        )
+                self.get_events().patch(
+                    calendarId=calendar['id'], eventId=new_event['id'], body=rem
+                )
+            )
 
         if self.details.get('url'):
             hlink = new_event['htmlLink']
@@ -1436,7 +1414,6 @@ class GoogleCalendarInterface:
         return new_event
 
     def AddEvent(self, title, where, start, end, descr, who, reminders, color):
-
         calendar = self._prompt_for_calendar(self.cals)
 
         event = {}
@@ -1447,10 +1424,8 @@ class GoogleCalendarInterface:
             event['end'] = {'date': end}
 
         else:
-            event['start'] = {'dateTime': start,
-                              'timeZone': calendar['timeZone']}
-            event['end'] = {'dateTime': end,
-                            'timeZone': calendar['timeZone']}
+            event['start'] = {'dateTime': start, 'timeZone': calendar['timeZone']}
+            event['end'] = {'dateTime': end, 'timeZone': calendar['timeZone']}
 
         if where:
             event['location'] = where
@@ -1473,15 +1448,13 @@ class GoogleCalendarInterface:
 
         return new_event
 
-    def ModifyEvents(self, work, search_text, start=None, end=None,
-                     expert=False):
+    def ModifyEvents(self, work, search_text, start=None, end=None, expert=False):
         if not search_text:
             raise GcalcliError('The empty string would get *ALL* events')
 
         event_list = self._search_for_events(start, end, search_text)
         self.expert = expert
-        return self._iterate_events(
-                self.now, event_list, year_date=True, work=work)
+        return self._iterate_events(self.now, event_list, year_date=True, work=work)
 
     def Remind(self, minutes, command, use_reminders=False):
         """
@@ -1492,36 +1465,40 @@ class GoogleCalendarInterface:
 
         # perform a date query for now + minutes + slip
         start = self.now
-        end = (start + timedelta(minutes=(minutes + 5)))
+        end = start + timedelta(minutes=(minutes + 5))
 
         event_list = self._search_for_events(start, end, None)
 
         message = ''
 
         for event in event_list:
-
             # skip this event if it already started
             # XXX maybe add a 2+ minute grace period here...
             if event['s'] < self.now:
                 continue
 
             # not sure if 'reminders' always in event
-            if use_reminders and 'reminders' in event \
-                    and 'overrides' in event['reminders']:
-                if all(event['s'] - timedelta(minutes=r['minutes']) > self.now
-                        for r in event['reminders']['overrides']):
+            if (
+                use_reminders
+                and 'reminders' in event
+                and 'overrides' in event['reminders']
+            ):
+                if all(
+                    event['s'] - timedelta(minutes=r['minutes']) > self.now
+                    for r in event['reminders']['overrides']
+                ):
                     # don't remind if all reminders haven't arrived yet
                     continue
 
             if self.options.get('military'):
                 tmp_time_str = event['s'].strftime('%H:%M')
             else:
-                tmp_time_str = \
-                    event['s'].strftime('%I:%M').lstrip('0') + \
-                    event['s'].strftime('%p').lower()
+                tmp_time_str = (
+                    event['s'].strftime('%I:%M').lstrip('0')
+                    + event['s'].strftime('%p').lower()
+                )
 
-            message += '%s  %s\n' % \
-                       (tmp_time_str, _valid_title(event).strip())
+            message += '%s  %s\n' % (tmp_time_str, _valid_title(event).strip())
 
         if not message:
             return
@@ -1537,7 +1514,7 @@ class GoogleCalendarInterface:
             os.execvp(cmd[0], cmd)
 
     def _event_should_use_new_import_api(
-            self, event: Event, cal: CalendarListEntry
+        self, event: Event, cal: CalendarListEntry
     ) -> bool:
         """Evaluates whether a given event should use the newer "import" API.
 
@@ -1547,27 +1524,26 @@ class GoogleCalendarInterface:
         if not self.options.get('use_legacy_import'):
             return False
         event_includes_self = any(
-                'self' in a or a['email'] == cal['id']
-                for a in event.get('attendees', []))
+            'self' in a or a['email'] == cal['id'] for a in event.get('attendees', [])
+        )
         return 'iCalUID' in event and event_includes_self
 
-    def ImportICS(self, verbose=False, dump=False, reminders=None,
-                  icsFile=None):
+    def ImportICS(self, verbose=False, dump=False, reminders=None, icsFile=None):
         if not ics.has_vobject_support():
-            self.printer.err_msg(
-                'Python vobject module not installed!\n'
-            )
+            self.printer.err_msg('Python vobject module not installed!\n')
             self.printer.msg(
                 'To use the import command, you need to first install the '
                 '"vobject" extra.\n'
                 'For setup instructions, see '
-                "https://github.com/insanum/gcalcli and documentation for the "
-                'gcalcli package on your platform.\n')
+                'https://github.com/insanum/gcalcli and documentation for the '
+                'gcalcli package on your platform.\n'
+            )
             sys_path_str = '\n  '.join(sys.path)
             self.printer.debug_msg(
                 'Searched for vobject using python interpreter at '
                 f'"{sys.executable}" with module search path:\n'
-                f"  {sys_path_str}\n")
+                f'  {sys_path_str}\n'
+            )
             sys.exit(1)
 
         if dump:
@@ -1586,20 +1562,20 @@ class GoogleCalendarInterface:
                 sys.exit(1)
 
         ical_data = ics.get_ics_data(
-            f,
-            verbose=verbose,
-            default_tz=self.cals[0]['timeZone'],
-            printer=self.printer)
+            f, verbose=verbose, default_tz=self.cals[0]['timeZone'], printer=self.printer
+        )
         if not dump and any(
-                self._event_should_use_new_import_api(event.body, self.cals[0])
-                for event in ical_data.events):
+            self._event_should_use_new_import_api(event.body, self.cals[0])
+            for event in ical_data.events
+        ):
             self.printer.msg(
                 '\n'
                 'NOTE: This import will use a new graceful import feature in '
                 'gcalcli to avoid creating duplicate events (see '
                 'https://github.com/insanum/gcalcli/issues/492).\n'
                 'If you see any issues, you can cancel and retry with '
-                '--use-legacy-import to restore the old behavior.\n\n')
+                '--use-legacy-import to restore the old behavior.\n\n'
+            )
             time.sleep(1)
 
         cal = self.cals[0]
@@ -1634,28 +1610,29 @@ class GoogleCalendarInterface:
 
             # Import event
             import_method = (
-                self.get_events().import_ if (
-                    self._event_should_use_new_import_api(event.body, cal))
-                else self.get_events().insert)
+                self.get_events().import_
+                if (self._event_should_use_new_import_api(event.body, cal))
+                else self.get_events().insert
+            )
             try:
                 new_event = self._retry_with_backoff(
-                    import_method(calendarId=cal['id'], body=event.body))
+                    import_method(calendarId=cal['id'], body=event.body)
+                )
             except HttpError as e:
                 failed_events.append(event)
                 try:
-                    is_skipped_dupe = any(detail.get('reason') == 'duplicate'
-                                          for detail in e.error_details)
+                    is_skipped_dupe = any(
+                        detail.get('reason') == 'duplicate' for detail in e.error_details
+                    )
                 except Exception:
                     # Fail gracefully so weird error responses don't blow up.
                     is_skipped_dupe = False
                 event_label = event.label_str()
                 if is_skipped_dupe:
                     # TODO: #492 - Offer to force import dupe anyway?
-                    self.printer.msg(
-                        f'Skipped duplicate event {event_label}.\n')
+                    self.printer.msg(f'Skipped duplicate event {event_label}.\n')
                 else:
-                    self.printer.err_msg(
-                        f'Failed to import event {event_label}.\n')
+                    self.printer.err_msg(f'Failed to import event {event_label}.\n')
                     self.printer.msg(f'Event details: {event.body}\n')
                     self.printer.debug_msg(f'Error details: {e}\n')
             else:
@@ -1663,24 +1640,19 @@ class GoogleCalendarInterface:
                 hlink = new_event.get('htmlLink')
                 self.printer.msg(f'New event added: {hlink}\n', 'green')
 
-        self.printer.msg(
-            f"Added {imported_cnt} events to calendar {cal['id']}\n"
-        )
+        self.printer.msg(f'Added {imported_cnt} events to calendar {cal["id"]}\n')
 
         if failed_events:
-            ics_dump_path = ics.dump_partial_ical(
-                failed_events, ical_data.raw_components
+            ics_dump_path = ics.dump_partial_ical(failed_events, ical_data.raw_components)
+            self.printer.msg(
+                f'Dumped {len(failed_events)} failed events to {ics_dump_path!s}.\n'
             )
             self.printer.msg(
-                f"Dumped {len(failed_events)} failed events to "
-                f"{ics_dump_path!s}.\n"
-            )
-            self.printer.msg(
-                "\n"
-                "Note: you can try reprocessing this file with `gcalcli "
-                "import --use-legacy-import` to work around some failure "
-                "causes (but with potentially noisier update notifications)."
-                "\n",
+                '\n'
+                'Note: you can try reprocessing this file with `gcalcli '
+                'import --use-legacy-import` to work around some failure '
+                'causes (but with potentially noisier update notifications).'
+                '\n',
             )
 
         return True
