@@ -78,7 +78,9 @@ select = ["E", "W", "F"]
 
 [tool.ruff.format]
 # Permit mixed quote style, project currently uses a mix of both.
-quote-style = "preserve"
+quote-style = "single"
+indent-style = "space"
+docstring-code-format = true
 
 [tool.ruff.lint.extend-per-file-ignores]
 "*.pyi" = ["E501"]
