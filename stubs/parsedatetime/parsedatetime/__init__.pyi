@@ -1,9 +1,10 @@
 import datetime
 import logging
 import time
-from _typeshed import Incomplete
 from collections.abc import Generator
 from typing import Tuple
+
+from _typeshed import Incomplete
 
 __version__: str
 __url__: str
@@ -29,10 +30,28 @@ class Calendar:
     def parseDate(self, dateString, sourceTime: Incomplete | None = None): ...
     def parseDateText(self, dateString, sourceTime: Incomplete | None = None): ...
     def evalRanges(self, datetimeString, sourceTime: Incomplete | None = None): ...
-    def parseDT(self, datetimeString, sourceTime: Incomplete | None = None, tzinfo: Incomplete | None = None, version: Incomplete | None = None) -> Tuple[datetime.datetime, Incomplete]: ...
-    def parse(self, datetimeString, sourceTime: Incomplete | None = None, version: Incomplete | None = None) -> Tuple[time.struct_time, Incomplete]: ...
-    def inc(self, source, month: Incomplete | None = None, year: Incomplete | None = None): ...
-    def nlp(self, inputString, sourceTime: Incomplete | None = None, version: Incomplete | None = None): ...
+    def parseDT(
+        self,
+        datetimeString,
+        sourceTime: Incomplete | None = None,
+        tzinfo: Incomplete | None = None,
+        version: Incomplete | None = None,
+    ) -> Tuple[datetime.datetime, Incomplete]: ...
+    def parse(
+        self,
+        datetimeString,
+        sourceTime: Incomplete | None = None,
+        version: Incomplete | None = None,
+    ) -> Tuple[time.struct_time, Incomplete]: ...
+    def inc(
+        self, source, month: Incomplete | None = None, year: Incomplete | None = None
+    ): ...
+    def nlp(
+        self,
+        inputString,
+        sourceTime: Incomplete | None = None,
+        version: Incomplete | None = None,
+    ): ...
 
 class Constants:
     localeID: Incomplete
@@ -86,7 +105,12 @@ class Constants:
     re_option: Incomplete
     cre_source: Incomplete
     cre_keys: Incomplete
-    def __init__(self, localeID: Incomplete | None = None, usePyICU: bool = True, fallbackLocales=['en_US']) -> None: ...
+    def __init__(
+        self,
+        localeID: Incomplete | None = None,
+        usePyICU: bool = True,
+        fallbackLocales=['en_US'],
+    ) -> None: ...
     def __getattr__(self, name): ...
     def daysInMonth(self, month, year): ...
     def getSource(self, sourceKey, sourceTime: Incomplete | None = None): ...

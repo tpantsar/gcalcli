@@ -1,4 +1,5 @@
 import abc
+
 from _typeshed import Incomplete
 
 class Credentials(metaclass=abc.ABCMeta):

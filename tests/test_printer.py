@@ -1,6 +1,6 @@
+import sys
 from argparse import ArgumentTypeError
 from io import StringIO
-import sys
 
 import pytest
 

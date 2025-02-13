@@ -1,11 +1,11 @@
 """Helpers for working with iCal/ics format."""
 
-from dataclasses import dataclass
 import importlib.util
 import io
-from datetime import datetime, timedelta
 import pathlib
 import tempfile
+from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Any, NamedTuple, Optional
 
 from gcalcli.printer import Printer
@@ -21,7 +21,7 @@ class EventData:
         if getattr(self.source, 'summary'):
             return f'"{self.source.summary}"'
         elif hasattr(self.source, 'dtstart') and self.source.dtstart.value:
-            return f"with start {self.source.dtstart.value}"
+            return f'with start {self.source.dtstart.value}'
         else:
             return None
 
@@ -44,9 +44,7 @@ def get_ics_data(
     raw_components: list[Any] = []
     for v in vobject.readComponents(ics):
         if v.name == 'VCALENDAR' and hasattr(v, 'components'):
-            raw_components.extend(
-                c for c in v.components() if c.name != 'VEVENT'
-            )
+            raw_components.extend(c for c in v.components() if c.name != 'VEVENT')
         # Strangely, in empty calendar cases vobject sometimes returns
         # Components with no vevent_list attribute at all.
         vevents = getattr(v, 'vevent_list', [])
@@ -124,8 +122,8 @@ def CreateEventFromVOBJ(
             duration = ve.duration.value
         else:
             printer.msg(
-                "Falling back to 30m duration for imported event w/o "
-                "explicit duration or end.\n"
+                'Falling back to 30m duration for imported event w/o '
+                'explicit duration or end.\n'
             )
             duration = timedelta(minutes=30)
         if verbose:
@@ -169,9 +167,7 @@ def CreateEventFromVOBJ(
             if verbose:
                 print(' %s' % email)
 
-            event['attendees'].append(
-                {'displayName': attendee.name, 'email': email}
-            )
+            event['attendees'].append({'displayName': attendee.name, 'email': email})
 
     if hasattr(ve, 'uid'):
         uid = ve.uid.value.strip()
@@ -187,13 +183,11 @@ def CreateEventFromVOBJ(
     return EventData(body=event, source=ve)
 
 
-def dump_partial_ical(
-    events: list[EventData], raw_components: list[Any]
-) -> pathlib.Path:
+def dump_partial_ical(events: list[EventData], raw_components: list[Any]) -> pathlib.Path:
     import vobject
 
-    tmp_dir = pathlib.Path(tempfile.mkdtemp(prefix="gcalcli."))
-    f_path = tmp_dir.joinpath("rej.ics")
+    tmp_dir = pathlib.Path(tempfile.mkdtemp(prefix='gcalcli.'))
+    f_path = tmp_dir.joinpath('rej.ics')
     cal = vobject.iCalendar()
     for c in raw_components:
         cal.add(c)

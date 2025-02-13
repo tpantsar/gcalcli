@@ -46,11 +46,7 @@ def patch(row, cal, interface):
 
             if curr_event is None:
                 curr_event = interface._retry_with_backoff(
-                    interface.get_events()
-                    .get(
-                        calendarId=cal_id,
-                        eventId=event_id
-                    )
+                    interface.get_events().get(calendarId=cal_id, eventId=event_id)
                 )
 
             handler.patch(cal, curr_event, fieldname, value)
@@ -58,12 +54,11 @@ def patch(row, cal, interface):
             handler.patch(cal, mod_event, fieldname, value)
 
     interface._retry_with_backoff(
-        interface.get_events()
-        .patch(
+        interface.get_events().patch(
             calendarId=cal_id,
             eventId=event_id,
             conferenceDataVersion=CONFERENCE_DATA_VERSION,
-            body=mod_event
+            body=mod_event,
         )
     )
 
@@ -77,16 +72,13 @@ def insert(row, cal, interface):
 
     for fieldname, handler, value in _iter_field_handlers(row):
         if fieldname in FIELDNAMES_READONLY:
-            raise ReadonlyError("Cannot specify value on insert.")
+            raise ReadonlyError('Cannot specify value on insert.')
 
         handler.patch(cal, event, fieldname, value)
 
     interface._retry_with_backoff(
-        interface.get_events()
-        .insert(
-            calendarId=cal_id,
-            conferenceDataVersion=CONFERENCE_DATA_VERSION,
-            body=event
+        interface.get_events().insert(
+            calendarId=cal_id, conferenceDataVersion=CONFERENCE_DATA_VERSION, body=event
         )
     )
 
@@ -103,4 +95,4 @@ def ignore(*args, **kwargs):
     """Do nothing."""
 
 
-ACTIONS = {"patch", "insert", "delete", "ignore"}
+ACTIONS = {'patch', 'insert', 'delete', 'ignore'}

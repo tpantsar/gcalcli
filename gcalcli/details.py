@@ -14,11 +14,10 @@ FMT_TIME = '%H:%M'
 TODAY = datetime.now().date()
 ACTION_DEFAULT = 'patch'
 
-URL_PROPS = OrderedDict([('html_link', 'htmlLink'),
-                         ('hangout_link', 'hangoutLink')])
-ENTRY_POINT_PROPS = OrderedDict([('conference_entry_point_type',
-                                  'entryPointType'),
-                                 ('conference_uri', 'uri')])
+URL_PROPS = OrderedDict([('html_link', 'htmlLink'), ('hangout_link', 'hangoutLink')])
+ENTRY_POINT_PROPS = OrderedDict(
+    [('conference_entry_point_type', 'entryPointType'), ('conference_uri', 'uri')]
+)
 
 
 def _valid_title(event):
@@ -163,10 +162,12 @@ class Url(Handler):
     @classmethod
     def patch(cls, cal, event, fieldname, value):
         if fieldname == 'html_link':
-            raise ReadonlyError(fieldname,
-                                'It is not possible to verify that the value '
-                                'has not changed. '
-                                'Remove it from the input.')
+            raise ReadonlyError(
+                fieldname,
+                'It is not possible to verify that the value '
+                'has not changed. '
+                'Remove it from the input.',
+            )
 
         prop = URL_PROPS[fieldname]
 
@@ -196,8 +197,7 @@ class Conference(Handler):
         # https://github.com/insanum/gcalcli/issues/533
         entry_point = data['entryPoints'][0]
 
-        return [entry_point.get(prop, '')
-                for prop in ENTRY_POINT_PROPS.values()]
+        return [entry_point.get(prop, '') for prop in ENTRY_POINT_PROPS.values()]
 
     @classmethod
     def patch(cls, cal, event, fieldname, value):
@@ -284,28 +284,37 @@ class Action(SimpleSingleFieldHandler):
         return ACTION_DEFAULT
 
 
-HANDLERS = OrderedDict([('id', ID),
-                        ('time', Time),
-                        ('length', Length),
-                        ('url', Url),
-                        ('conference', Conference),
-                        ('title', Title),
-                        ('location', Location),
-                        ('description', Description),
-                        ('calendar', Calendar),
-                        ('email', Email),
-                        ('action', Action)])
+HANDLERS = OrderedDict(
+    [
+        ('id', ID),
+        ('time', Time),
+        ('length', Length),
+        ('url', Url),
+        ('conference', Conference),
+        ('title', Title),
+        ('location', Location),
+        ('description', Description),
+        ('calendar', Calendar),
+        ('email', Email),
+        ('action', Action),
+    ]
+)
 HANDLERS_READONLY = {Url, Calendar}
 
-FIELD_HANDLERS = dict(chain.from_iterable(
-    (((fieldname, handler)
-      for fieldname in handler.fieldnames)
-     for handler in HANDLERS.values())))
+FIELD_HANDLERS = dict(
+    chain.from_iterable(
+        (
+            ((fieldname, handler) for fieldname in handler.fieldnames)
+            for handler in HANDLERS.values()
+        )
+    )
+)
 
-FIELDNAMES_READONLY = frozenset(fieldname
-                                for fieldname, handler
-                                in FIELD_HANDLERS.items()
-                                if handler in HANDLERS_READONLY)
+FIELDNAMES_READONLY = frozenset(
+    fieldname
+    for fieldname, handler in FIELD_HANDLERS.items()
+    if handler in HANDLERS_READONLY
+)
 
 _DETAILS_WITHOUT_HANDLERS = ['reminders', 'attendees', 'attachments', 'end']
 

@@ -1,9 +1,9 @@
 """Helpers and data objects for gcalcli configuration."""
 
 import argparse
+import sys
 from collections import OrderedDict
 from enum import Enum
-import sys
 from typing import Any, List, Mapping, Optional
 
 if sys.version_info[:2] < (3, 11):
@@ -54,8 +54,8 @@ using --calendar) when running commands against all calendars',
 
 
 class WeekStart(str, Enum):
-    SUNDAY = "sunday"
-    MONDAY = "monday"
+    SUNDAY = 'sunday'
+    MONDAY = 'monday'
 
 
 class OutputSection(BaseModel):
@@ -122,8 +122,7 @@ def schema_entity_ordered(entity: Mapping[str, Any]) -> Mapping[str, Any]:
     if 'properties' in keys:
         keys.remove('properties')
         ordered['properties'] = OrderedDict(
-            (k, schema_entity_ordered(v))
-            for k, v in entity['properties'].items()
+            (k, schema_entity_ordered(v)) for k, v in entity['properties'].items()
         )
     # Include remaining fields in arbitrary order.
     for k in sorted(keys):
