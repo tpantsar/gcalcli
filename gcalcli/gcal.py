@@ -312,7 +312,7 @@ class GoogleCalendarInterface:
         auth.refresh_if_expired(self.credentials)
         self.printer.debug_msg('Successfully loaded credentials\n')
 
-    def get_cal_service(self):
+    def get_cal_service(self) -> build:
         if not self.cal_service and not self.userless_mode:
             self.cal_service = build(
                 serviceName='calendar',
@@ -389,13 +389,13 @@ class GoogleCalendarInterface:
         elif cal.get('colorSpec', None):
             return cal['colorSpec']
         elif cal['accessRole'] == self.ACCESS_OWNER:
-            return self.options['color_owner']
+            return self.options.get('color_owner')
         elif cal['accessRole'] == self.ACCESS_WRITER:
-            return self.options['color_writer']
+            return self.options.get('color_writer')
         elif cal['accessRole'] == self.ACCESS_READER:
-            return self.options['color_reader']
+            return self.options.get('color_reader')
         elif cal['accessRole'] == self.ACCESS_FREEBUSY:
-            return self.options['color_freebusy']
+            return self.options.get('color_freebusy')
         else:
             return 'default'
 
@@ -775,36 +775,36 @@ class GoogleCalendarInterface:
 
         if not prefix:
             prefix = indent
-        self.printer.msg(prefix, self.options['color_date'])
+        self.printer.msg(prefix, self.options.get('color_date'))
 
         happening_now = event['s'] <= self.now <= event['e']
         all_day = is_all_day(event)
-        if self.options['override_color'] and event.get('colorId'):
+        if self.options.get('override_color') and event.get('colorId'):
             if happening_now and not all_day:
-                event_color = self.options['color_now_marker']
+                event_color = self.options.get('color_now_marker')
             else:
                 event_color = self._calendar_color(event, override_color=True)
         else:
             event_color = (
-                self.options['color_now_marker']
+                self.options.get('color_now_marker')
                 if happening_now and not all_day
                 else self._calendar_color(event)
             )
 
-        time_width = '%-5s' if self.options['military'] else '%-7s'
+        time_width = '%-5s' if self.options.get('military') else '%-7s'
         if all_day:
             fmt = '  ' + time_width + '  %s\n'
             self.printer.msg(fmt % ('', _valid_title(event).strip()), event_color)
         else:
             tmp_start_time_str = utils.agenda_time_fmt(
-                event['s'], self.options['military']
+                event['s'], self.options.get('military')
             )
             tmp_end_time_str = ''
             fmt = '  ' + time_width + '   ' + time_width + '  %s\n'
 
             if self.details.get('end'):
                 tmp_end_time_str = utils.agenda_time_fmt(
-                    event['e'], self.options['military']
+                    event['e'], self.options.get('military')
                 )
                 fmt = '  ' + time_width + ' - ' + time_width + '  %s\n'
 
@@ -1124,6 +1124,7 @@ class GoogleCalendarInterface:
             self._PrintEvent(event, event['s'].strftime('\n%Y-%m-%d'))
 
     def _iterate_events(self, start_datetime, event_list, year_date=False, work=None):
+        """Iterate over events and print them."""
         selected = 0
 
         if len(event_list) == 0:
@@ -1246,6 +1247,7 @@ class GoogleCalendarInterface:
             )
 
     def _display_queried_events(self, start, end, search=None, year_date=False):
+        """Display events queried by the user between start and end."""
         event_list = self._search_for_events(start, end, search)
 
         if self.options.get('tsv'):

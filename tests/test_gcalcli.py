@@ -161,21 +161,21 @@ def test_quick_add_with_cal_prompt(PatchedGCalI, capsys, monkeypatch):
     )
 
 
-def test_text_query(PatchedGCalI):
+def test_text_query(PatchedGCalIForEvents):
     search_parser = get_search_parser()
-    gcal = PatchedGCalI()
 
-    # TODO: mock the api reply for the search
+    # Mock the API reply to return some results
     # and then assert something greater than zero
+    gcal = PatchedGCalIForEvents()
 
     opts = search_parser.parse_args(['test', '1970-01-01', '2038-01-18'])
-    assert gcal.TextQuery(opts.text, opts.start, opts.end) == 0
+    assert gcal.TextQuery(opts.text, opts.start, opts.end) == 2
 
     opts = search_parser.parse_args(['test', '1970-01-01'])
-    assert gcal.TextQuery(opts.text, opts.start, opts.end) == 0
+    assert gcal.TextQuery(opts.text, opts.start, opts.end) == 2
 
     opts = search_parser.parse_args(['test'])
-    assert gcal.TextQuery(opts.text, opts.start, opts.end) == 0
+    assert gcal.TextQuery(opts.text, opts.start, opts.end) == 2
 
 
 def test_declined_event_no_attendees(PatchedGCalI):
