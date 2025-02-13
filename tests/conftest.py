@@ -15,7 +15,7 @@ from tests._utils import APICallTracker
 
 TEST_DATA_DIR = os.path.dirname(os.path.abspath(__file__)) + '/data'
 
-mock_events = [
+mock_event = [
     {
         'colorId': '10',
         'created': '2018-12-31T09:20:32.000Z',
@@ -51,47 +51,9 @@ mock_events = [
         'sequence': 0,
         'start': {'dateTime': '2019-01-08T14:15:00Z'},
         'status': 'confirmed',
-        'summary': 'Test Event 1',
+        'summary': 'Test Event',
         'updated': '2018-12-31T09:20:32.210Z',
-    },
-    {
-        'colorId': '9',
-        'created': '2018-12-31T09:20:32.000Z',
-        'creator': {'email': 'matthew.lemon@gmail.com'},
-        'e': datetime(2019, 1, 8, 17, 15, tzinfo=tzlocal()),
-        'end': {'dateTime': '2019-01-08T17:15:00Z'},
-        'etag': '"3092496064420000"',
-        'gcalcli_cal': {
-            'accessRole': 'owner',
-            'backgroundColor': '#4986e7',
-            'colorId': '16',
-            'conferenceProperties': {'allowedConferenceSolutionTypes': ['eventHangout']},
-            'defaultReminders': [],
-            'etag': '"153176133553001"',
-            'foregroundColor': '#000000',
-            'id': '12pp3nqp@group.calendar.google.com',
-            'kind': 'calendar#calendarListEntry',
-            'selected': True,
-            'summary': 'Test Calendar',
-            'timeZone': 'Europe/London',
-        },
-        'htmlLink': '',
-        'iCalUID': '31376E6-8B63-416C-B73A-74D10F51G',
-        'id': '_6coj0c9o88r3b9a26spk2b9n6sojed2464o4cd9h8p',
-        'kind': 'calendar#event',
-        'organizer': {
-            'displayName': 'Test Calendar',
-            'email': 'tst@group.google.com',
-            'self': True,
-        },
-        'reminders': {'useDefault': True},
-        's': datetime(2019, 1, 8, 16, 15, tzinfo=tzlocal()),
-        'sequence': 0,
-        'start': {'dateTime': '2019-01-08T16:15:00Z'},
-        'status': 'confirmed',
-        'summary': 'Test Event 2',
-        'updated': '2018-12-31T10:20:32.210Z',
-    },
+    }
 ]
 
 

@@ -813,7 +813,7 @@ class GoogleCalendarInterface:
                 event_color = self._calendar_color(event, override_color=True)
         else:
             event_color = (
-                self.options.get('color_now_marker')
+                self.options['color_now_marker']
                 if happening_now and not all_day
                 else self._calendar_color(event)
             )
@@ -824,14 +824,14 @@ class GoogleCalendarInterface:
             self.printer.msg(fmt % ('', _valid_title(event).strip()), event_color)
         else:
             tmp_start_time_str = utils.agenda_time_fmt(
-                event['s'], self.options.get('military')
+                event['s'], self.options['military']
             )
             tmp_end_time_str = ''
             fmt = '  ' + time_width + '   ' + time_width + '  %s\n'
 
             if self.details.get('end'):
                 tmp_end_time_str = utils.agenda_time_fmt(
-                    event['e'], self.options.get('military')
+                    event['e'], self.options['military']
                 )
                 fmt = '  ' + time_width + ' - ' + time_width + '  %s\n'
 
@@ -1151,7 +1151,6 @@ class GoogleCalendarInterface:
             self._PrintEvent(event, event['s'].strftime('\n%Y-%m-%d'))
 
     def _iterate_events(self, start_datetime, event_list, year_date=False, work=None):
-        """Iterate over events and print them."""
         selected = 0
 
         if len(event_list) == 0:
@@ -1182,11 +1181,7 @@ class GoogleCalendarInterface:
         return selected
 
     def _GetAllEvents(
-        self,
-        cal,
-        start: datetime,
-        end: datetime,
-        search_text: str | None = None,
+        self, cal, start: datetime, end: datetime, search_text
     ) -> Iterable[Event]:
         pageToken = None
         while True:
@@ -1278,7 +1273,6 @@ class GoogleCalendarInterface:
             )
 
     def _display_queried_events(self, start, end, search=None, year_date=False):
-        """Display events queried by the user between start and end."""
         event_list = self._search_for_events(start, end, search)
 
         if self.options.get('tsv'):
@@ -1417,43 +1411,6 @@ class GoogleCalendarInterface:
             return cals_with_write_perms[int(val)]
         except IndexError:
             raise GcalcliError(f'Invalid selection from the list above: {val}\n')
-
-    def _log_event(self, event, calendar, title, descr=None, where=None, reminders=None):
-        """
-        Logs new event details to CLI after adding to the calendar.
-        Handles missing keys in the event object.
-        """
-        self.printer.msg('New event added!\n', 'green')
-
-        if isinstance(event, dict):
-            html_link = event.get('htmlLink')
-            if html_link:
-                self.printer.msg(f'{html_link}\n', 'blue')
-
-            self.printer.msg(f'Summary: {title}\n', 'green')
-
-            if descr:
-                self.printer.msg(f'Description: {descr}\n', 'green')
-            if where:
-                self.printer.msg(f'Location: {where}\n', 'green')
-
-            start_time = event.get('start', {}).get('dateTime')
-            end_time = event.get('end', {}).get('dateTime')
-            calendar_summary = calendar.get('summary', '')
-
-            if start_time:
-                self.printer.msg(f'Start: {start_time}\n', 'green')
-            if end_time:
-                self.printer.msg(f'End: {end_time}\n', 'green')
-            if calendar_summary:
-                self.printer.msg(f'Calendar: {calendar_summary}\n', 'green')
-            if reminders:
-                self.printer.msg('Reminders:\n', 'green')
-                for r in reminders:
-                    n, m = utils.parse_reminder(r)
-                    self.printer.msg(f'  {m}: {n} minutes\n', 'green')
-        else:
-            self.printer.msg('Event details not available\n', 'yellow')
 
     def QuickAddEvent(self, event_text, reminders=None):
         """Wrapper around Google Calendar API's quickAdd"""
