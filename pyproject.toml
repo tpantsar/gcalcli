@@ -52,7 +52,7 @@ dev = [
   "types-toml; python_version < '3.11'",
   "types-vobject",
   "invoke",
-  "black",
+  "ruff",
 ]
 vobject = ["vobject"]
 
