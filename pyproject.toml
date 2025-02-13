@@ -51,6 +51,8 @@ dev = [
   "types-requests",
   "types-toml; python_version < '3.11'",
   "types-vobject",
+  "invoke",
+  "black",
 ]
 vobject = ["vobject"]
 
@@ -67,7 +69,7 @@ version_file = "gcalcli/_version.py"
 gcalcli = "gcalcli.cli:main"
 
 [tool.ruff]
-line-length = 80
+line-length = 90
 extend-exclude = ["tests/cli/"]
 
 [tool.ruff.lint]
