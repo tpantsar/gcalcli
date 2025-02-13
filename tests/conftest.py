@@ -143,10 +143,6 @@ def gcali_patches(monkeypatch):
             msg = self.colors[colorname] + msg + self.colors['default']
         sys.stdout.write(msg)
 
-    # def mocked_print(self, *args, **kwargs):
-    #     pass
-    # monkeypatch.setattr(GoogleCalendarInterface, '_PrintEvent', mocked_print)
-
     monkeypatch.setattr(GoogleCalendarInterface, '_get_cached', mocked_calendar_list)
     monkeypatch.setattr(Printer, 'msg', mocked_msg)
 
