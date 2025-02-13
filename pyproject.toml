@@ -40,9 +40,9 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/insanum/gcalcli"
-Issues = "https://github.com/insanum/gcalcli/issues"
-Changelog = "https://github.com/insanum/gcalcli/blob/HEAD/ChangeLog"
+Repository = "https://github.com/tpantsar/gcalcli"
+Issues = "https://github.com/tpantsar/gcalcli/issues"
+Changelog = "https://github.com/tpantsar/gcalcli/blob/HEAD/ChangeLog"
 
 [project.optional-dependencies]
 dev = [
