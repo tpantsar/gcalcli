@@ -1164,7 +1164,7 @@ class GoogleCalendarInterface:
 
         return selected
 
-    def _GetAllEvents(self, cal, start, end, search_text) -> Iterable[Event]:
+    def _GetAllEvents(self, cal, start: datetime, end: datetime, search_text) -> Iterable[Event]:
         pageToken = None
         while True:
             events = self._retry_with_backoff(
