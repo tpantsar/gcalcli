@@ -2,7 +2,7 @@
 
 Google Calendar Command Line Interface
 
-[![Build Status](https://github.com/insanum/gcalcli/actions/workflows/tests.yml/badge.svg)](https://github.com/insanum/gcalcli/actions/workflows/tests.yml)
+[![Build Status](https://github.com/tpantsar/gcalcli/actions/workflows/tests.yml/badge.svg)](https://github.com/tpantsar/gcalcli/actions/workflows/tests.yml)
 
 gcalcli is a Python application that allows you to access your Google
 Calendar(s) from a command line. It's easy to get your agenda, search for
@@ -16,28 +16,27 @@ gcalcli uses the [Google Calendar API version
 
 ## Features
 
- * OAuth2 authentication with your Google account
- * list your calendars
- * show an agenda using a specified start/end date and time
- * show updates since a specified datetime for events between a start/end date and time
- * find conflicts between events matching search term
- * ascii text graphical calendar display with variable width
- * search for past and/or future events
- * "quick add" new events to a specified calendar
- * "add" a new event to a specified calendar (interactively or automatically)
- * "delete" event(s) from a calendar(s) (interactively or automatically)
- * "edit" event(s) interactively
- * import events from ICS/vCal files to a specified calendar
- * easy integration with your favorite mail client (attachment handler)
- * run as a cron job and execute a command for reminders
- * work against specific calendars (by calendar name w/ regex)
- * flag file support for specifying option defaults
- * colored output and unicode character support
- * custom shell completion for bash, zsh, fish, etc
- * super fun hacking with shell scripts, cron, screen, tmux, conky, etc
+- OAuth2 authentication with your Google account
+- list your calendars
+- show an agenda using a specified start/end date and time
+- show updates since a specified datetime for events between a start/end date and time
+- find conflicts between events matching search term
+- ascii text graphical calendar display with variable width
+- search for past and/or future events
+- "quick add" new events to a specified calendar
+- "add" a new event to a specified calendar (interactively or automatically)
+- "delete" event(s) from a calendar(s) (interactively or automatically)
+- "edit" event(s) interactively
+- import events from ICS/vCal files to a specified calendar
+- easy integration with your favorite mail client (attachment handler)
+- run as a cron job and execute a command for reminders
+- work against specific calendars (by calendar name w/ regex)
+- flag file support for specifying option defaults
+- colored output and unicode character support
+- custom shell completion for bash, zsh, fish, etc
+- super fun hacking with shell scripts, cron, screen, tmux, conky, etc
 
-[![Screenshot of agenda and calendar view](https://raw.githubusercontent.com/insanum/gcalcli/HEAD/docs/gcalcli_5_sm.png)](https://raw.githubusercontent.com/insanum/gcalcli/HEAD/docs/gcalcli_5.png)
-
+[![Screenshot of agenda and calendar view](https://raw.githubusercontent.com/tpantsar/gcalcli/HEAD/docs/gcalcli_5_sm.png)](https://raw.githubusercontent.com/tpantsar/gcalcli/HEAD/docs/gcalcli_5.png)
 
 ## Requirements
 
@@ -55,8 +54,8 @@ If your OS doesn't have the latest released version you can install using pip
 
 Several Linux distros have packages available. A few popular ones...
 
-* Debian/Ubuntu: `sudo apt install gcalcli`
-* Void Linux: `xbps-install gcalcli`
+- Debian/Ubuntu: `sudo apt install gcalcli`
+- Void Linux: `xbps-install gcalcli`
 
 ### Install using [Nix](https://nixos.org/nix/)
 
@@ -86,7 +85,7 @@ pip install gcalcli
 ### Install from source
 
 ```sh
-git clone https://github.com/insanum/gcalcli.git
+git clone https://github.com/tpantsar/gcalcli.git
 cd gcalcli
 pip install .[vobject]
 ```
@@ -119,7 +118,7 @@ authentication process will proceed. Simply follow the instructions.
 **You currently have to use your own Calendar API token.** Our Calendar API token is restricted to few users only and waits for Google's approval to be unlocked.
 
 Set up your Google "project" and auth token as explained in
-[docs/auth-api.md](https://github.com/insanum/gcalcli/blob/HEAD/docs/api-auth.md),
+[docs/auth-api.md](https://github.com/tpantsar/gcalcli/blob/HEAD/docs/api-auth.md),
 then run gcalcli passing a `--client-id` to finish setup:
 
 ```shell
@@ -166,7 +165,7 @@ platform's standard config directory path. Edit it with `gcalcli config edit`.
 Example:
 
 ```toml
-#:schema https://raw.githubusercontent.com/insanum/gcalcli/HEAD/data/config-schema.json
+#:schema https://raw.githubusercontent.com/tpantsar/gcalcli/HEAD/data/config-schema.json
 [calendars]
 default-calendars = ["Personal", "Work"]
 ignore-calendars = ["Boring stuff", "Holidays"]
@@ -206,7 +205,7 @@ in between) like:
 --client-secret=API_KEY
 ```
 
-Note that long options require an equal sign if specifying a parameter.  With
+Note that long options require an equal sign if specifying a parameter. With
 short options the equal sign is optional.
 
 Currently any file named "gcalclirc" in your config directory (or a ~/.gcalclirc
@@ -249,6 +248,7 @@ some other tool to ensure gcalcli is run in a timely manner for notifications.
 Two options are using cron or a loop inside a shell script.
 
 Cron:
+
 ```sh
 % crontab -l
 */10 * * * * /usr/bin/gcalcli remind
@@ -256,6 +256,7 @@ Cron:
 
 Shell script like your .xinitrc so notifications only occur when you're logged
 in via X:
+
 ```bash
 #!/bin/bash
 
@@ -278,8 +279,8 @@ me and use nothing that is common I highly recommend the
 [dunst](https://github.com/knopwob/dunst) dmenu'ish notification daemon.
 
 Note that each time you run this you will get a reminder if you're still inside
-the event duration.  Also note that due to time slip between machines, gcalcli
-will give you a ~5 minute margin of error.  Plan your cron jobs accordingly.
+the event duration. Also note that due to time slip between machines, gcalcli
+will give you a ~5 minute margin of error. Plan your cron jobs accordingly.
 
 ### Agenda On Your Root Desktop
 
@@ -299,7 +300,7 @@ To also get a graphical calendar that shows the next three weeks add:
 ${execpi 300 gcalcli --conky calw 3}
 ```
 
-You may need to increase the `text_buffer_size` in your conkyrc file.  Users
+You may need to increase the `text_buffer_size` in your conkyrc file. Users
 have reported that the default of 256 bytes is too small for busy calendars.
 
 Additionally you need to set `--lineart=unicode` to output unicode-characters
@@ -307,13 +308,14 @@ for box drawing. To avoid misaligned borders use a monospace font like 'DejaVu
 Sans Mono'. On Python2 it might be necessary to set the environment variable
 `PYTHONIOENCODING=utf8` if you are using characters beyond ascii. For
 example:
+
 ```
 ${font DejaVu Sans Mono:size=9}${execpi 300 export PYTHONIOENCODING=utf8 && gcalcli --conky --lineart=unicode calw 3}
 ```
 
 ### Agenda Integration With tmux
 
-Put your next event in the left of your 'tmux' status line.  Add the following
+Put your next event in the left of your 'tmux' status line. Add the following
 to your tmux.conf file:
 
 ```tmux
@@ -323,7 +325,7 @@ set-option -g status-left "#[fg=blue,bright]#(gcalcli agenda | head -2 | tail -1
 
 ### Agenda Integration With screen
 
-Put your next event in your 'screen' hardstatus line.  First add a cron job
+Put your next event in your 'screen' hardstatus line. First add a cron job
 that will dump you agenda to a text file:
 
 ```shell
@@ -354,12 +356,12 @@ hardstatus "[ %1` ]"
 
 ## More screenshots
 
-![gcalcli 1](https://raw.githubusercontent.com/insanum/gcalcli/HEAD/docs/gcalcli_1.png)
+![gcalcli 1](https://raw.githubusercontent.com/tpantsar/gcalcli/HEAD/docs/gcalcli_1.png)
 
-![gcalcli 2](https://raw.githubusercontent.com/insanum/gcalcli/HEAD/docs/gcalcli_2.png)
+![gcalcli 2](https://raw.githubusercontent.com/tpantsar/gcalcli/HEAD/docs/gcalcli_2.png)
 
-![gcalcli 3](https://raw.githubusercontent.com/insanum/gcalcli/HEAD/docs/gcalcli_3.png)
+![gcalcli 3](https://raw.githubusercontent.com/tpantsar/gcalcli/HEAD/docs/gcalcli_3.png)
 
 Reminder popup:
 
-![Reminder popup](https://raw.githubusercontent.com/insanum/gcalcli/HEAD/docs/gcalcli_4.png)
+![Reminder popup](https://raw.githubusercontent.com/tpantsar/gcalcli/HEAD/docs/gcalcli_4.png)
