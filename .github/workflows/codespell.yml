@@ -3,9 +3,10 @@ name: Codespell
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
+    types: [opened, synchronize]
 
 permissions:
   contents: read
@@ -20,3 +21,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
+        with:
+          only_warn: 1

@@ -2,11 +2,12 @@ name: Tests (tox)
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
+    types: [opened, synchronize]
     paths-ignore:
-      - '*.md'
+      - "*.md"
       - ChangeLog
       - LICENSE
       - docs/**
@@ -43,7 +44,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.py }}
-          cache: 'pip'
+          cache: "pip"
       - name: Cache .mypy_cache
         uses: actions/cache@v4
         with:
