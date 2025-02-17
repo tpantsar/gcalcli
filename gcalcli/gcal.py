@@ -1366,6 +1366,7 @@ class GoogleCalendarInterface:
         self._GraphEvents(cmd, start, count, event_list)
 
     def _prompt_for_calendar(self, cals):
+        """Prompt the user to select a calendar from indexed list."""
         if not cals:
             raise GcalcliError('No available calendar to use')
         if len(cals) == 1:
@@ -1382,6 +1383,20 @@ class GoogleCalendarInterface:
         val = get_input(self.printer, 'Specify calendar from above: ', STR_TO_INT)
         try:
             return cals_with_write_perms[int(val)]
+        except IndexError:
+            raise GcalcliError(f'Invalid selection from the list above: {val}\n')
+
+    def _prompt_for_event(self, events):
+        """Prompt the user to select a template event from indexed list."""
+        if not events:
+            raise GcalcliError('No available event to use')
+        if len(events) == 1:
+            return events[0]
+        # Event not specified. Prompt the user to select it
+        print('\n'.join(f'{idx} {event}' for idx, event in enumerate(events)))
+        val = get_input(self.printer, 'Select template: ', STR_TO_INT)
+        try:
+            return events[int(val)]
         except IndexError:
             raise GcalcliError(f'Invalid selection from the list above: {val}\n')
 
