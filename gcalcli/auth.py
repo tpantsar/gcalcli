@@ -9,6 +9,11 @@ from gcalcli.printer import Printer
 
 
 def authenticate(client_id: str, client_secret: str, printer: Printer, local: bool):
+    """
+    During the authorization process, Google OAuth may return an error.
+    Use this guide to troubleshoot the most common errors during this process.
+    https://developers.google.com/nest/device-access/reference/errors/authorization
+    """
     flow = InstalledAppFlow.from_client_config(
         client_config={
             'installed': {
@@ -17,7 +22,7 @@ def authenticate(client_id: str, client_secret: str, printer: Printer, local: bo
                 'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
                 'token_uri': 'https://oauth2.googleapis.com/token',
                 'auth_provider_x509_cert_url': 'https://www.googleapis.com/oauth2/v1/certs',
-                'redirect_uris': ['http://localhost'],
+                'redirect_uri': ['http://localhost'],
             }
         },
         scopes=['https://www.googleapis.com/auth/calendar'],
