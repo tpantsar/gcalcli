@@ -19,38 +19,29 @@ def test_get_time_from_str():
 
 
 def test_get_time_from_str_non_dayfirst_locale():
-    TIMEZONE = 'Europe/Helsinki'
-    when = '2025-01-26 11:00'
-
     # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone(TIMEZONE)
+    local_timezone = pytz.timezone('Europe/Helsinki')
 
     # Localize the expected datetime to the specified timezone
     expected = local_timezone.localize(datetime(2025, 1, 26, 11, 0))
-    result = get_time_from_str(when).astimezone(local_timezone)
-    # logger.info(result)
+    result = get_time_from_str('2025-01-26 11:00').astimezone(local_timezone)
 
     assert result == expected, f'Expected {expected}, but got {result}'
 
 
 def test_get_time_from_str_valid_fuzzy_parse_next_week():
-    when = 'next Friday at 6pm'
     current_year = datetime.now().year
+    result = get_time_from_str('next Friday at 6pm')
 
-    result = get_time_from_str(when)
-    # logger.info(result)
     assert result.year == current_year, f'Expected {current_year}, but got {result.year}'
     assert result.weekday() == 4, f'Expected Friday, but got {result.strftime("%A")}'
     assert result.hour == 18, f'Expected 18:00, but got {result.strftime("%H:%M")}'
 
 
 def test_get_time_from_str_valid_fuzzy_parse_today():
-    when = 'Today at 3pm'
-
     current_year = datetime.now().year
+    result = get_time_from_str('Today at 3pm')
 
-    result = get_time_from_str(when)
-    # logger.info(result)
     assert result.year == current_year, f'Expected {current_year}, but got {result.year}'
     assert result.weekday() == datetime.now().weekday(), (
         f'Expected today, but got {result.strftime("%A")}'
@@ -59,52 +50,46 @@ def test_get_time_from_str_valid_fuzzy_parse_today():
 
 
 def test_get_time_from_str_invalid_date():
-    when = 'invalid date string'
     with pytest.raises(ValueError, match='Date and time is invalid'):
-        get_time_from_str(when)
+        get_time_from_str('invalid date string')
 
 
 def test_get_time_from_str_invalid_date_emptystring():
-    when = ''
     with pytest.raises(ValueError, match='Date and time is invalid'):
-        get_time_from_str(when)
+        get_time_from_str('')
+
+
+def test_get_time_from_str_invalid_date_blankstring():
+    with pytest.raises(ValueError, match='Date and time is invalid'):
+        get_time_from_str(' ')
 
 
 def test_get_time_from_str_dayfirst_locale():
-    TIMEZONE = 'Europe/Helsinki'
-    when = '04-10-2024 18:00'
-
     # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone(TIMEZONE)
+    local_timezone = pytz.timezone('Europe/Helsinki')
 
     expected = local_timezone.localize(datetime(2024, 10, 4, 18, 0))
-    result = get_time_from_str(when).astimezone(local_timezone)
+    result = get_time_from_str('04-10-2024 18:00').astimezone(local_timezone)
 
     assert result == expected, f'Expected {expected}, but got {result}'
 
 
 def test_get_time_from_str_dayfirst_locale_leading_zeroes():
-    TIMEZONE = 'Europe/Helsinki'
-    when = '04.09.2024 18:00'
-
     # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone(TIMEZONE)
+    local_timezone = pytz.timezone('Europe/Helsinki')
 
     expected = local_timezone.localize(datetime(2024, 9, 4, 18, 0))
-    result = get_time_from_str(when).astimezone(local_timezone)
+    result = get_time_from_str('04.09.2024 18:00').astimezone(local_timezone)
 
     assert result == expected, f'Expected {expected}, but got {result}'
 
 
 def test_get_time_from_str_dayfirst_locale_non_leading_zeroes():
-    TIMEZONE = 'Europe/Helsinki'
-    when = '4.5.2024 9:00'
-
     # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone(TIMEZONE)
+    local_timezone = pytz.timezone('Europe/Helsinki')
 
     expected = local_timezone.localize(datetime(2024, 5, 4, 9, 0))
-    result = get_time_from_str(when).astimezone(local_timezone)
+    result = get_time_from_str('4.5.2024 9:00').astimezone(local_timezone)
 
     assert result == expected, f'Expected {expected}, but got {result}'
 
@@ -124,9 +109,10 @@ def test_get_parsed_timedelta_from_str():
     assert get_timedelta_from_str('2 days 1 hour 2 minutes 40 seconds') == timedelta(
         days=2, hours=1, minutes=2, seconds=40
     )
-    with pytest.raises(ValueError) as ve:
-        get_timedelta_from_str('junk')
-    assert str(ve.value) == 'Duration is invalid: junk'
+    for duration in ['junk', '1h1m1s1x']:
+        with pytest.raises(ValueError) as ve:
+            get_timedelta_from_str(duration)
+        assert str(ve.value) == f'Duration is invalid: {duration}'
 
 
 def test_get_times_from_duration():
