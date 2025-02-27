@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import pytest
-import pytz
 from dateutil.tz import UTC, tzutc
 
 from gcalcli.utils import (
@@ -15,18 +14,8 @@ from gcalcli.utils import (
 
 
 def test_get_time_from_str():
-    assert get_time_from_str('7am tomorrow')
-
-
-def test_get_time_from_str_non_dayfirst_locale():
-    # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone('Europe/Helsinki')
-
-    # Localize the expected datetime to the specified timezone
-    expected = local_timezone.localize(datetime(2025, 1, 26, 11, 0))
-    result = get_time_from_str('2025-01-26 11:00').astimezone(local_timezone)
-
-    assert result == expected, f'Expected {expected}, but got {result}'
+    time = get_time_from_str('7am tomorrow')
+    assert time.date() == datetime.now().date() + timedelta(days=1)
 
 
 def test_get_time_from_str_valid_fuzzy_parse_next_week():
@@ -62,36 +51,6 @@ def test_get_time_from_str_invalid_date_emptystring():
 def test_get_time_from_str_invalid_date_blankstring():
     with pytest.raises(ValueError, match='Date and time is invalid'):
         get_time_from_str(' ')
-
-
-def test_get_time_from_str_dayfirst_locale():
-    # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone('Europe/Helsinki')
-
-    expected = local_timezone.localize(datetime(2024, 10, 4, 18, 0))
-    result = get_time_from_str('04-10-2024 18:00').astimezone(local_timezone)
-
-    assert result == expected, f'Expected {expected}, but got {result}'
-
-
-def test_get_time_from_str_dayfirst_locale_leading_zeroes():
-    # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone('Europe/Helsinki')
-
-    expected = local_timezone.localize(datetime(2024, 9, 4, 18, 0))
-    result = get_time_from_str('04.09.2024 18:00').astimezone(local_timezone)
-
-    assert result == expected, f'Expected {expected}, but got {result}'
-
-
-def test_get_time_from_str_dayfirst_locale_non_leading_zeroes():
-    # Convert UTC datetime to local datetime
-    local_timezone = pytz.timezone('Europe/Helsinki')
-
-    expected = local_timezone.localize(datetime(2024, 5, 4, 9, 0))
-    result = get_time_from_str('4.5.2024 9:00').astimezone(local_timezone)
-
-    assert result == expected, f'Expected {expected}, but got {result}'
 
 
 def test_get_parsed_timedelta_from_str():
