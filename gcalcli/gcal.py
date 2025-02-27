@@ -312,7 +312,7 @@ class GoogleCalendarInterface:
         auth.refresh_if_expired(self.credentials)
         self.printer.debug_msg('Successfully loaded credentials\n')
 
-    def get_cal_service(self) -> build:
+    def get_cal_service(self):
         if not self.cal_service and not self.userless_mode:
             self.cal_service = build(
                 serviceName='calendar',
