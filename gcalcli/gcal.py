@@ -1444,9 +1444,19 @@ class GoogleCalendarInterface:
         request = events.insert(calendarId=calendar['id'], body=event)
         new_event = self._retry_with_backoff(request)
 
-        if self.details.get('url'):
-            hlink = new_event['htmlLink']
-            self.printer.msg('New event added: %s\n' % hlink, 'green')
+        self.printer.msg('New event added!\n', 'green')
+        try:
+            html_link = new_event['htmlLink']
+            if html_link:
+                self.printer.msg('Link: %s\n' % html_link, 'green')
+        except Exception:
+            pass
+
+        self.printer.msg('Summary: %s\n' % title, 'green')
+        self.printer.msg('Description: %s\n' % descr, 'green')
+        self.printer.msg('Location: %s\n' % where, 'green')
+        self.printer.msg('Start: %s\n' % start, 'green')
+        self.printer.msg('End: %s\n' % end, 'green')
 
         return new_event
 
