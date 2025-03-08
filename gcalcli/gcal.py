@@ -1385,6 +1385,43 @@ class GoogleCalendarInterface:
         except IndexError:
             raise GcalcliError(f'Invalid selection from the list above: {val}\n')
 
+    def _log_event(self, event, calendar, title, descr=None, where=None, reminders=None):
+        """
+        Logs new event details to CLI after adding to the calendar.
+        Handles missing keys in the event object.
+        """
+        self.printer.msg('New event added!\n', 'green')
+
+        if isinstance(event, dict):
+            html_link = event.get('htmlLink')
+            if html_link:
+                self.printer.msg(f'{html_link}\n', 'blue')
+
+            self.printer.msg(f'Summary: {title}\n', 'green')
+
+            if descr:
+                self.printer.msg(f'Description: {descr}\n', 'green')
+            if where:
+                self.printer.msg(f'Location: {where}\n', 'green')
+
+            start_time = event.get('start', {}).get('dateTime')
+            end_time = event.get('end', {}).get('dateTime')
+            calendar_summary = calendar.get('summary', '')
+
+            if start_time:
+                self.printer.msg(f'Start: {start_time}\n', 'green')
+            if end_time:
+                self.printer.msg(f'End: {end_time}\n', 'green')
+            if calendar_summary:
+                self.printer.msg(f'Calendar: {calendar_summary}\n', 'green')
+            if reminders:
+                self.printer.msg('Reminders:\n', 'green')
+                for r in reminders:
+                    n, m = utils.parse_reminder(r)
+                    self.printer.msg(f'  {m}: {n} minutes\n', 'green')
+        else:
+            self.printer.msg('Event details not available\n', 'yellow')
+
     def QuickAddEvent(self, event_text, reminders=None):
         """Wrapper around Google Calendar API's quickAdd"""
         if not event_text:
@@ -1409,9 +1446,11 @@ class GoogleCalendarInterface:
                 )
             )
 
-        if self.details.get('url'):
-            hlink = new_event['htmlLink']
-            self.printer.msg('New event added: %s\n' % hlink, 'green')
+        self._log_event(
+            event=new_event,
+            calendar=calendar,
+            title=event_text,
+        )
 
         return new_event
 
@@ -1444,19 +1483,14 @@ class GoogleCalendarInterface:
         request = events.insert(calendarId=calendar['id'], body=event)
         new_event = self._retry_with_backoff(request)
 
-        self.printer.msg('New event added!\n', 'green')
-        try:
-            html_link = new_event['htmlLink']
-            if html_link:
-                self.printer.msg('Link: %s\n' % html_link, 'green')
-        except Exception:
-            pass
-
-        self.printer.msg('Summary: %s\n' % title, 'green')
-        self.printer.msg('Description: %s\n' % descr, 'green')
-        self.printer.msg('Location: %s\n' % where, 'green')
-        self.printer.msg('Start: %s\n' % start, 'green')
-        self.printer.msg('End: %s\n' % end, 'green')
+        self._log_event(
+            event=new_event,
+            calendar=calendar,
+            title=title,
+            descr=descr,
+            where=where,
+            reminders=reminders,
+        )
 
         return new_event
 
