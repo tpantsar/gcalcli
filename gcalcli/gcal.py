@@ -1155,7 +1155,11 @@ class GoogleCalendarInterface:
         return selected
 
     def _GetAllEvents(
-        self, cal, start: datetime, end: datetime, search_text
+        self,
+        cal,
+        start: datetime,
+        end: datetime,
+        search_text: str | None = None,
     ) -> Iterable[Event]:
         pageToken = None
         while True:
