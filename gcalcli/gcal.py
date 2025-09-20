@@ -232,12 +232,12 @@ class GoogleCalendarInterface:
             with oauth_filepath.open('wb') as gcalcli_oauth:
                 pickle.dump(self.credentials, gcalcli_oauth)
 
-    def SetupAuth(self):
+    def SetupAuth(self, ignore_refresh: bool = False):
         oauth_filepath = self.data_file_path('oauth')
 
         # Try loading cached credentials
         self._load_credentials()
-        if self.credentials:
+        if self.credentials and not ignore_refresh:
             self.printer.msg('Credentials already configured. ')
             self.printer.msg('Ignore and refresh? [N]o [y]es: ', 'magenta')
             val = input()
