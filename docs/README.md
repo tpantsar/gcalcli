@@ -82,12 +82,27 @@ If you don't need the `import` command you can install without extras:
 pip install gcalcli
 ```
 
-### Install from source
+### Install using the bash install script
+
+```sh
+# curl
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tpantsar/gcalcli/main/install.sh)"
+
+# wget
+bash -c "$(wget -qO- https://raw.githubusercontent.com/tpantsar/gcalcli/main/install.sh)"
+
+# fetch
+bash -c "$(fetch -o - https://raw.githubusercontent.com/tpantsar/gcalcli/main/install.sh)"
+```
+
+### Install from source and build
 
 ```sh
 git clone https://github.com/tpantsar/gcalcli.git
 cd gcalcli
-pip install .[vobject]
+python -m venv .venv
+source .venv/bin/activate
+pip install .
 ```
 
 ## Usage
