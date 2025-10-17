@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# Detect OS
+if ! command -v python3 &>/dev/null; then
+  echo "python3 is not installed. Please install Python 3 and try again."
+  exit 1
+fi
+
 OS="$(uname -s)"
 
 echo "🔍 Detecting OS..."
@@ -30,10 +34,6 @@ if [[ "$OS" == "Linux" ]]; then
   fi
 
   # Create virtual environment
-  if ! command -v python3 &>/dev/null; then
-    echo "python3 is not installed. Please install Python 3 and try again."
-    exit 1
-  fi
   python3 -m venv .venv
   source .venv/bin/activate
 
