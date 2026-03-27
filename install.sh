@@ -30,7 +30,7 @@ if [[ "$OS" == "Linux" ]]; then
       exit 1
     }
     git checkout main
-    git pull origin main
+    git pull --rebase --autostash origin main
   fi
 
   # Create virtual environment
