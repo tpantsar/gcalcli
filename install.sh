@@ -6,14 +6,13 @@ if ! command -v python3 &>/dev/null; then
 fi
 
 OS="$(uname -s)"
+REPO_PATH="$HOME/gcalcli"
 
 echo "🔍 Detecting OS..."
 if [[ "$OS" == "Linux" ]]; then
   echo "Linux detected. Setting up virtual environment..."
 
-  REPO_PATH="$HOME/gcalcli"
   INSTALL_PATH="/usr/local/bin"
-
   sudo mkdir -p "$INSTALL_PATH"
 
   if [[ ! -d "$REPO_PATH" ]]; then
@@ -52,7 +51,6 @@ if [[ "$OS" == "Linux" ]]; then
 elif [[ "$OS" == "MINGW"* || "$OS" == "CYGWIN"* || "$OS" == "MSYS"* ]]; then
   echo "Windows detected. Setting up virtual environment..."
 
-  REPO_PATH="$HOME/gcalcli"
   INSTALL_PATH="$HOME/bin"
 
   git clone https://github.com/tpantsar/gcalcli.git "$REPO_PATH"
